@@ -288,10 +288,16 @@ public class MMF {
 		
 		for (Double value : cash){
 			CashDistribution buffer = new CashDistribution();
-			if (value >= 0){
+			if (value > 0){
 				buffer.setLeast(0.0);
 				buffer.setMost(1.2 * value);
 				buffer.setMode(value);
+				cashvalue.add(i++, buffer);
+			}
+			else if (value == 0){
+				buffer.setLeast(0.0);
+				buffer.setMost(value + 0.001);
+				buffer.setMode(value + 0.0005);
 				cashvalue.add(i++, buffer);
 			}
 			else {

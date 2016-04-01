@@ -8,6 +8,7 @@ import com.opencsv.*;
 import cs.ucl.moifm.model.DeliverySequence;
 import cs.ucl.moifm.model.MMFException;
 import cs.ucl.moifm.model.Project;
+import cs.ucl.moifm.util.Genetic;
 import cs.ucl.moifm.util.MCSimulation;
 import cs.ucl.moifm.util.ModelParser;
 import cs.ucl.moifm.util.Population;
@@ -23,6 +24,9 @@ import java.util.Random;
  *
  */
 public class Main {
+	
+	public static final int NO_GENERATION = 50;
+	public static final int POP_SIZE = 10;
 
 	/**
 	 * @param args
@@ -38,14 +42,14 @@ public class Main {
 			 ModelParser.fileToModelParser(reader, project);
 			 ModelParser.convertFileToPrecedence(precedenceReader, project);
 			 
-			 DeliverySequence dseq = new DeliverySequence();
-			 dseq.setSequence(project);
-			 project.setSanpv();
+			// DeliverySequence dseq = new DeliverySequence();
+			// dseq.setSequence(project);
+			// project.setSanpv();
 			 MCSimulation simu = new MCSimulation(project.getPeriods());
 			 simu.simulate(project);
 			 simu.simulate_sanpv(project.getSimCashflow(), project);
 			 
-			 Double value[][] = project.getSimCashflow().get("A");
+			/* Double value[][] = project.getSimCashflow().get("A");
 			 Double sanpv[][] = project.getSimSanpv().get("A");
 			 Double[] val = value[0];
 			 Double[] val2 = sanpv[0];
@@ -61,19 +65,23 @@ public class Main {
 				 System.out.println("\n");
 			 }
 			 */
-			 Population pop = new Population(10, project, true);
-			 for (int i = 0; i < 10; i++){
-				 System.out.println(pop.dSequence.get(i));
-				 pop.dSequence.get(i).setFitness(project);
-				 System.out.println(pop.dSequence.get(i).getExpectedNPV());
+			 Population pop = new Population(POP_SIZE, project, true);			 
+			 for (int i = 0; i < NO_GENERATION; i++){
+				 pop = Genetic.evolvePopulation(pop);
 			 }
-			 dseq.setFitness(project);
+			 
+			 
+			 for (int i = 0; i < POP_SIZE; i++){
+				 System.out.println(pop.dSequence.get(i) + "ENPV = " + pop.dSequence.get(i).getExpectedNPV());
+			//	 pop.dSequence.get(i).setFitness(project);
+			 }
+			/* dseq.setFitness(project);
 			 System.out.println("Cost = " + dseq.getExpectedCost());
 			 System.out.println("Revenue = " + dseq.getExpectedNPV());
 			 
 			 System.out.println(dseq.toString());
 			 
-			 System.out.println(project.getMmfs().get("C").getPrecursorString());
+			 System.out.println(project.getMmfs().get("C").getPrecursorString());*/
 			 reader.close();
 			 precedenceReader.close(); 
 		} catch (FileNotFoundException e) {

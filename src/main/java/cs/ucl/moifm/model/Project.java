@@ -161,7 +161,7 @@ public class Project implements PropertyChangeListener {
      * @return true of valid, false if not or a duplicate exists
      */
     public boolean isValidId(String id) {
-        return (null != id) && id.matches("Z*[A-Y]*[1-9]") && (null == get(id));
+        return (null != id) && id.matches("Z*[A-Y]*[1-9]*") && (null == get(id));
     }
     
     /**

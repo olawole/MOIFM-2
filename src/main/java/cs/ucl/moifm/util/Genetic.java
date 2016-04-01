@@ -12,19 +12,12 @@ public class Genetic {
 	private static final double MUTATION_RATE = 0.015;
 	private static final int TOURNAMENT_SIZE = 5;
 	private static final boolean ELITISM = true;
-	private static final int POPULATION_SIZE = 50;
+	private static final int POPULATION_SIZE = 10;
 	
-	private static Project project;
 	
-	public Genetic(Project proj){
-		project = proj;
-	}
 	
 	public static Population evolvePopulation(Population pop){
-		Population newPopulation = new Population(pop.dSequence.size(), project, false);
-		
-		
-		
+		Population newPopulation = new Population(POPULATION_SIZE, pop.project, false);
 		//keep best solutions if eliticism is enabled
 		
 		int elitismOffset = 0;
@@ -35,7 +28,7 @@ public class Genetic {
 			}
 		}
 		//Crossover population to form new offsprings
-		for (int i = elitismOffset; i < newPopulation.dSequence.size(); i++){
+		for (int i = elitismOffset; i < POPULATION_SIZE; i++){
 			//Select Parents
 			DeliverySequence child;
 			do{
@@ -46,12 +39,13 @@ public class Genetic {
 				mutate(child);
 			} while (Population.archive.contains(child.toString()));
 			
+			child.setFitness(pop.project);
 			newPopulation.saveSequence(i, child);
 			Population.archive.add(child.toString());
 		}
 			
 		
-		return newPopulation; // to be removed later
+		return newPopulation;
 	}
 
 	// Mutate a sequence using swap mutation
@@ -71,7 +65,9 @@ public class Genetic {
 	private static DeliverySequence crossover(DeliverySequence parent_1,
 			DeliverySequence parent_2) {
 		DeliverySequence child = new DeliverySequence();
-		
+		for(int k = 0; k < parent_1.getSequence().size(); k++){
+			child.getSequence().add("");
+		}
 		// Get the start and end subsequence for parent 1 sequence
 		int startPos = (int) (Math.random() * parent_1.getSequence().size());
 		int endPos = (int) (Math.random() * parent_1.getSequence().size());
@@ -79,11 +75,14 @@ public class Genetic {
 		//note
 		for (int i = 0; i < child.getSequence().size(); i++){
 			if (startPos < endPos && i > startPos && i < endPos){
+				child.getSequence().remove(i);
 				child.getSequence().add(i, parent_1.getSequence().get(i));
 			}
 			else if (startPos > endPos){
-				if (!(i < startPos && i > endPos))
+				if (!(i < startPos && i > endPos)){
+					child.getSequence().remove(i);
 					child.getSequence().add(i, parent_1.getSequence().get(i));
+				}
 			}
 		}
 		
@@ -91,7 +90,8 @@ public class Genetic {
 		for (int i = 0; i < parent_2.getSequence().size(); i++){
 			// if child doesn't have the MMF add it
 			if (!child.getSequence().contains(parent_2.getSequence().get(i))){
-				child.getSequence().add(parent_1.getSequence().get(i));
+				child.getSequence().remove(i);
+				child.getSequence().add(i, parent_1.getSequence().get(i));
 			}
 		}
 		return child;

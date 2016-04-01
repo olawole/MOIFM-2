@@ -158,17 +158,19 @@ public class DeliverySequence {
 				double periodCum = 0; //cumulative revenue generated in a development period
 				if (periodCount != 0){
 					int j = 1; 
-					while (j <= periodCount){
-						Double value = project.getSimCashflow().get(sequence.get(j-1))[k][periodCount];
-						periodCum += getDiscountedValue(project.getInterestRate(), periodCount+1, value);
+					while (j <= i){
+						for(int p = 0; p < devPeriod; p++){
+							Double value = project.getSimCashflow().get(sequence.get(j-1))[k][periodCount+p];
+							periodCum += getDiscountedValue(project.getInterestRate(), periodCount+p+1, value);
 						//periodCum += project.getMmfs().get(sequence.get(j-1)).getDiscountedValue(project.getInterestRate(), periodCount+1);
-						j += project.getMmfs().get(sequence.get(j-1)).getDevPeriod();
+						}
+						j += 1;
 					}
 				}
 				// Get investment cost
 				if (devPeriod == 1){
 					Double value = project.getSimCashflow().get(currentMmf)[k][devPeriod-1];
-					periodCum += getDiscountedValue(project.getInterestRate(), devPeriod, value);
+					periodCum += getDiscountedValue(project.getInterestRate(), periodCount+1, value);
 					//periodCum += project.getMmfs().get(currentMmf).getDiscountedValue(project.getInterestRate(), devPeriod);		
 					//expectedCost += (periodCum < 0) ? periodCum : 0;
 					cost[k] += (periodCum < 0) ? periodCum : 0;
@@ -176,10 +178,11 @@ public class DeliverySequence {
 				else {
 					for (int j = 1; j <= devPeriod; j++){
 						Double value = project.getSimCashflow().get(currentMmf)[k][j-1];
-						periodCum += getDiscountedValue(project.getInterestRate(), j, value);
+						periodCum += getDiscountedValue(project.getInterestRate(), periodCount+j, value);
 						//periodCum += project.getMmfs().get(currentMmf).getDiscountedValue(project.getInterestRate(), devPeriod);		
-						cost[k] += (periodCum < 0) ? periodCum : 0;
+						
 					}
+					cost[k] += (periodCum < 0) ? periodCum : 0;
 				}
 				//Get Net present value
 				Double[] temp = project.getSimSanpv().get(currentMmf)[k];
@@ -208,35 +211,8 @@ public class DeliverySequence {
 		investmentRisk = Math.abs(expectedNPV / npvSD);
 		expectedROI = expectedNPV / expectedCost;
 		
-		System.out.println("Risk = " + investmentRisk);
-		/*for (int i = 0; i < sequence.size(); i++){
-			int devPeriod = project.getMmfs().get(sequence.get(i)).getDevPeriod();
-			double periodCum = 0;
-			if (periodCount != 0){
-				int j = 1; 
-				while (j <= periodCount){
-					periodCum += project.getMmfs().get(sequence.get(j-1)).getDiscountedValue(project.getInterestRate(), periodCount+1);
-					j += project.getMmfs().get(sequence.get(j-1)).getDevPeriod();
-				}
-			}
-			// Get investment cost
-			if (devPeriod == 1){
-				periodCum += project.getMmfs().get(sequence.get(i)).getDiscountedValue(project.getInterestRate(), devPeriod);		
-				expectedCost += (periodCum < 0) ? periodCum : 0;
-			}
-			else {
-				for (int j = 1; j <= devPeriod; j++){
-					periodCum += project.getMmfs().get(sequence.get(i)).getDiscountedValue(project.getInterestRate(), devPeriod);		
-					expectedCost += (periodCum < 0) ? periodCum : 0;
-				}
-			}
-			//Get Net present value
-			Double[] temp = project.getSanpv().get(sequence.get(i));
-			double value = temp[periodCount];
-			expectedNPV += value;
-			
-			periodCount += devPeriod;
-		}*/
+	//	System.out.println("Risk = " + investmentRisk);
+		
 	}
 	
 	
@@ -262,3 +238,32 @@ public class DeliverySequence {
     	return value / Math.pow(interestRate + 1, period);
     }
 }
+
+/*for (int i = 0; i < sequence.size(); i++){
+int devPeriod = project.getMmfs().get(sequence.get(i)).getDevPeriod();
+double periodCum = 0;
+if (periodCount != 0){
+	int j = 1; 
+	while (j <= periodCount){
+		periodCum += project.getMmfs().get(sequence.get(j-1)).getDiscountedValue(project.getInterestRate(), periodCount+1);
+		j += project.getMmfs().get(sequence.get(j-1)).getDevPeriod();
+	}
+}
+// Get investment cost
+if (devPeriod == 1){
+	periodCum += project.getMmfs().get(sequence.get(i)).getDiscountedValue(project.getInterestRate(), devPeriod);		
+	expectedCost += (periodCum < 0) ? periodCum : 0;
+}
+else {
+	for (int j = 1; j <= devPeriod; j++){
+		periodCum += project.getMmfs().get(sequence.get(i)).getDiscountedValue(project.getInterestRate(), devPeriod);		
+		expectedCost += (periodCum < 0) ? periodCum : 0;
+	}
+}
+//Get Net present value
+Double[] temp = project.getSanpv().get(sequence.get(i));
+double value = temp[periodCount];
+expectedNPV += value;
+
+periodCount += devPeriod;
+}*/

@@ -11,9 +11,9 @@ public class Population {
 	
 	public List<DeliverySequence> dSequence;
 	
-	public static List<String> archive;
+	public static List<String> archive = new ArrayList<String>();
 	
-	Project project;
+	public Project project;
 	
 	/*
 	 * Generate initial population for the Genetic process
@@ -24,7 +24,7 @@ public class Population {
 	 */
 	public Population(int populationSize, Project proj, boolean initialize){
 		dSequence = new ArrayList<DeliverySequence>();
-		Population.archive = new ArrayList<String>();
+	//	Population.archive = new ArrayList<String>();
 		this.project = proj;
 		if (initialize && proj != null){
 			int counter = 0;
@@ -35,6 +35,7 @@ public class Population {
 					Collections.shuffle(newSequence.getSequence());
 				}
 				if (newSequence.isValidSequence(proj)){
+					newSequence.setFitness(proj);
 					saveSequence(counter++, newSequence);
 					Population.archive.add(newSequence.toString());
 				}
