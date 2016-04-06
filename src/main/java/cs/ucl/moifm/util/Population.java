@@ -12,6 +12,7 @@ public class Population {
 	public List<DeliverySequence> dSequence;
 	
 	public static List<String> archive = new ArrayList<String>();
+	public static List<String> invalid = new ArrayList<String>();
 	
 	public Project project;
 	
@@ -38,6 +39,9 @@ public class Population {
 					newSequence.setFitness(proj);
 					saveSequence(counter++, newSequence);
 					Population.archive.add(newSequence.toString());
+				}
+				else {
+					Population.invalid.add(newSequence.toString());
 				}
 			}
 		}
@@ -75,6 +79,50 @@ public class Population {
 				nonDominated.add(dSequence.get(i));
 		}
 		return nonDominated;
+	}
+	
+	public List<Front> fastNonDominatedSort(){
+	//	System.out.println("Enter Fast");
+		List<Front> fronts = new ArrayList<Front>(5);
+		Front first = new Front(0);
+		
+		for (DeliverySequence p : dSequence){
+			p.domCount = 0;
+			p.domSet.clear();
+			for (DeliverySequence q : dSequence){
+				if (dominates(p,q)){
+					p.domSet.add(q);
+				}
+				else if (dominates(q,p)){
+					p.domCount = p.domCount + 1;
+				}
+			}
+			if (p.domCount == 0){
+				p.rank = 0;
+				first.members.add(p);
+			}
+		}
+		fronts.add(first);
+		
+		int i = 0;
+		while (i < fronts.size() && !fronts.get(i).members.isEmpty()){
+			Front nextFront = new Front(i+1);
+			for (DeliverySequence p : fronts.get(i).members){
+				for (DeliverySequence q : p.domSet){
+					q.domCount = q.domCount - 1;
+					if (q.domCount == 0){
+						q.rank = i + 1;
+						nextFront.members.add(q);
+					}
+				}
+			}
+			++i;
+			fronts.add(nextFront);
+ 
+		}
+	//	System.out.println("Exit Fast");
+		return fronts;
+
 	}
 	
 	public boolean dominates (DeliverySequence s1, DeliverySequence s2){

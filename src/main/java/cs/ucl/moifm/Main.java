@@ -8,6 +8,7 @@ import com.opencsv.*;
 import cs.ucl.moifm.model.DeliverySequence;
 import cs.ucl.moifm.model.MMFException;
 import cs.ucl.moifm.model.Project;
+import cs.ucl.moifm.util.Front;
 import cs.ucl.moifm.util.Genetic;
 import cs.ucl.moifm.util.MCSimulation;
 import cs.ucl.moifm.util.ModelParser;
@@ -25,8 +26,8 @@ import java.util.Random;
  */
 public class Main {
 	
-	public static final int NO_GENERATION = 50;
-	public static final int POP_SIZE = 10;
+	public static final int NO_GENERATION = 40;
+	public static final int POP_SIZE = 20;
 
 	/**
 	 * @param args
@@ -36,6 +37,7 @@ public class Main {
 	public static void main(String[] args) throws IOException, MMFException {
 		// TODO Auto-generated method stub
 		try {
+			long startTime = System.currentTimeMillis();
 			CSVReader reader = new CSVReader(new FileReader("input2.csv"));
 			CSVReader precedenceReader = new CSVReader(new FileReader("precedence2.csv"));
 			 Project project = new Project();
@@ -67,23 +69,25 @@ public class Main {
 			 */
 			 Population pop = new Population(POP_SIZE, project, true);			 
 			 for (int i = 0; i < NO_GENERATION; i++){
+				 System.out.println("Generation " + (i+1));
 				 pop = Genetic.evolvePopulation(pop);
 			 }
-			 
-			 
-			 for (int i = 0; i < POP_SIZE; i++){
-				 System.out.println(pop.dSequence.get(i) + "ENPV = " + pop.dSequence.get(i).getExpectedNPV());
+			 System.out.println("\n----------------------------------------------------------------------");
+			 Front pareto = pop.fastNonDominatedSort().get(0);
+			 pareto.sortNpv(0, pareto.members.size() - 1);
+			 for (int i = 0; i < pareto.members.size(); i++){
+				 System.out.println(pareto.members.get(i) + "\tENPV = " + pareto.members.get(i).getExpectedNPV()
+						 + "\tECOST = " + pareto.members.get(i).getExpectedCost() + "\tRisk = " + 
+						 pareto.members.get(i).getInvestmentRisk());
 			//	 pop.dSequence.get(i).setFitness(project);
 			 }
-			/* dseq.setFitness(project);
-			 System.out.println("Cost = " + dseq.getExpectedCost());
-			 System.out.println("Revenue = " + dseq.getExpectedNPV());
-			 
-			 System.out.println(dseq.toString());
-			 
-			 System.out.println(project.getMmfs().get("C").getPrecursorString());*/
+			 System.out.println("Solutions Explored = " + Population.archive.size());
+			 System.out.println("Mutation = " + Genetic.mutationNumber);
+			 System.out.println("Crossover = " + Genetic.crossOverNumber);
 			 reader.close();
 			 precedenceReader.close(); 
+			 long runtime = System.currentTimeMillis() - startTime;
+			 System.out.println("Runtime = " + runtime / 1000 + " Seconds");
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

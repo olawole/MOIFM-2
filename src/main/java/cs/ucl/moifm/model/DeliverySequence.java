@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
+
 import org.apache.commons.math3.stat.descriptive.*;
 public class DeliverySequence {
 	
@@ -25,6 +27,16 @@ public class DeliverySequence {
 	// Return on investment of the delivery sequence
 	private double expectedROI;
 	
+	public int domCount;
+	
+	public double minNpv, maxNpv, minCost, maxCost;
+	
+	public List<DeliverySequence> domSet;
+	
+	public int rank;
+	
+	public double crowdingDistance;
+	
 	//Default constructor
 	public DeliverySequence(){
 		this.sequence = new ArrayList<String>();
@@ -33,6 +45,7 @@ public class DeliverySequence {
 		this.investmentRisk = 0;
 		this.irr = 0;
 		this.expectedROI = 0;
+		domSet = new ArrayList<DeliverySequence>();
 	}
 	
 	/**
@@ -206,7 +219,11 @@ public class DeliverySequence {
 		}
 		
 		expectedCost = statsCost.getMean();
+		minCost = statsCost.getMin();
+		maxCost = statsCost.getMax();
 		expectedNPV = statsNpv.getMean();
+		minNpv = statsNpv.getMin();
+		maxNpv = statsNpv.getMax();
 		double npvSD = statsNpv.getStandardDeviation();
 		investmentRisk = Math.abs(expectedNPV / npvSD);
 		expectedROI = expectedNPV / expectedCost;
@@ -214,7 +231,6 @@ public class DeliverySequence {
 	//	System.out.println("Risk = " + investmentRisk);
 		
 	}
-	
 	
 	
 	public void generateIndividuals(Project project){	
