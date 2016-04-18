@@ -9,12 +9,12 @@ import cs.ucl.moifm.model.Project;
 public class Genetic {
 	
 	//parameters
-	private static final double MUTATION_RATE = 0.015;
+	private static final double MUTATION_RATE = 1.0 / 9.0;
 	public static int mutationNumber = 0;
 	public static int crossOverNumber = 0;
 	//private static final int TOURNAMENT_SIZE = 3;
 	//private static final boolean ELITISM = true;
-	private static final int POPULATION_SIZE = 20;
+	private static final int POPULATION_SIZE = 30;
 	
 	public static Population evolvePopulation(Population pop){
 		//System.out.println("Enter Evolve");
@@ -118,8 +118,11 @@ public class Genetic {
 					Population.invalid.add(child.toString());
 					continue;
 				}
+				//else if (child.isValidSequence(pop.project) && (pop.project.getMaxMmfsPerPeriod() > 1)){
+				//		child.convertSequence(pop.project);
+				//}
 			} while (Population.archive.contains(child.toString()) || !(child.isValidSequence(pop.project)));
-			child.setFitness(pop.project);
+			child.setFitnes(pop.project);
 			children.saveSequence(i, child);
 			//System.out.println(i);
 			Population.archive.add(child.toString());

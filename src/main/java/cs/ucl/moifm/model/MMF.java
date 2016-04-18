@@ -88,7 +88,6 @@ public class MMF {
         this.id = id;
         this.name = "";
         this.devPeriod = 1;
-        this.strand = 1;
         this.precursors = new ArrayList<MMF>();
         this.cashflow = new ArrayList<Double>();
         this.cashvalue = new ArrayList<CashDistribution>();
@@ -231,8 +230,18 @@ public class MMF {
             this.precursors.add(precursor);
             changeSupport.firePropertyChange(EVENT_PRECURSORS, null, precursor);
         }
-    }
+    } 
     
+   /* public void addPrecursor(MMF precursor) throws MMFException {
+        if (this.precursors.indexOf(precursor) < 0) {
+        	for (MMF p : precursor.getPrecursors()){
+        		this.addPrecursor(p);
+        	}
+            checkValidPrecursor(precursor);
+            this.precursors.add(precursor);
+            changeSupport.firePropertyChange(EVENT_PRECURSORS, null, precursor);
+        }
+    }*/
     /**
      * Checks if the precursor is valid. Mostly that no circular precursors
      * exists.
@@ -415,6 +424,14 @@ public class MMF {
     	discountValue = getRevenue(period) / Math.pow(interestRate + 1, period);
     	
     	return discountValue;
+    }
+    
+    public int getStrand(){
+    	return this.strand;
+    }
+    
+    public void setStrand(int strand){
+    	this.strand = strand;
     }
     
     

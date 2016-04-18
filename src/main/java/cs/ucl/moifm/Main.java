@@ -26,8 +26,8 @@ import java.util.Random;
  */
 public class Main {
 	
-	public static final int NO_GENERATION = 40;
-	public static final int POP_SIZE = 20;
+	public static final int NO_GENERATION = 30;
+	public static final int POP_SIZE = 30;
 
 	/**
 	 * @param args
@@ -38,8 +38,8 @@ public class Main {
 		// TODO Auto-generated method stub
 		try {
 			long startTime = System.currentTimeMillis();
-			CSVReader reader = new CSVReader(new FileReader("input2.csv"));
-			CSVReader precedenceReader = new CSVReader(new FileReader("precedence2.csv"));
+			CSVReader reader = new CSVReader(new FileReader("input3.csv"));
+			CSVReader precedenceReader = new CSVReader(new FileReader("precedence3.csv"));
 			 Project project = new Project();
 			 ModelParser.fileToModelParser(reader, project);
 			 ModelParser.convertFileToPrecedence(precedenceReader, project);
@@ -70,7 +70,10 @@ public class Main {
 			 Population pop = new Population(POP_SIZE, project, true);			 
 			 for (int i = 0; i < NO_GENERATION; i++){
 				 System.out.println("Generation " + (i+1));
+				 long start = System.currentTimeMillis();
 				 pop = Genetic.evolvePopulation(pop);
+				 long runT = System.currentTimeMillis() - start;
+				 System.out.println("Time = " + runT/1000 + " Seconds");
 			 }
 			 System.out.println("\n----------------------------------------------------------------------");
 			 Front pareto = pop.fastNonDominatedSort().get(0);
@@ -78,7 +81,7 @@ public class Main {
 			 for (int i = 0; i < pareto.members.size(); i++){
 				 System.out.println(pareto.members.get(i) + "\tENPV = " + pareto.members.get(i).getExpectedNPV()
 						 + "\tECOST = " + pareto.members.get(i).getExpectedCost() + "\tRisk = " + 
-						 pareto.members.get(i).getInvestmentRisk());
+						 pareto.members.get(i).getInvestmentRisk() + "\tEROI = " + pareto.members.get(i).getExpectedROI());
 			//	 pop.dSequence.get(i).setFitness(project);
 			 }
 			 System.out.println("Solutions Explored = " + Population.archive.size());

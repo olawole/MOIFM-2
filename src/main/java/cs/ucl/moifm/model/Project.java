@@ -6,10 +6,12 @@ import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 
 public class Project implements PropertyChangeListener {
@@ -29,6 +31,7 @@ public class Project implements PropertyChangeListener {
    // private List<MMF> mmfs;
     private String nextId;
     private int maxMmfsPerPeriod;
+    private List<String> strands;
     public int nOfSim;
     
     private double budgetConstraint;
@@ -40,14 +43,15 @@ public class Project implements PropertyChangeListener {
     public Project() {
         this.name = "New MMF Project";
         this.periods = 12;
-        this.interestRate = 0.008;
+        this.interestRate = 0.0241;
         this.nextId = "A";
         this.mmfs = new LinkedHashMap<String, MMF>();
-        this.maxMmfsPerPeriod = 1;
+        this.maxMmfsPerPeriod = 2;
         this.budgetConstraint = 0.0;
         this.sanpv = new HashMap<String, Double[]>();
         this.changeSupport = new PropertyChangeSupport(this);
-        this.nOfSim = 5000;
+        this.nOfSim = 10000;
+        this.strands = new ArrayList<String>();
     }
     
     public String getName() {
@@ -299,6 +303,56 @@ public class Project implements PropertyChangeListener {
 	 */
 	public void setSimSanpv(HashMap<String, Double[][]> simSanpv) {
 		this.simSanpv = simSanpv;
+	}
+
+	/**
+	 * @return the strands
+	 */
+	public List<String> getStrands() {
+		return strands;
+	}
+
+	/**
+	 * @param strands the strands to set
+	 */
+	public void setStrands() {
+		Set<String> strand = mmfs.keySet();
+		Set<String> newStrand = new HashSet<String>(strand.size());
+		Set<String> temp = new HashSet<String>(strand.size());
+		do{
+			newStrand = new HashSet<String>(strand.size());
+			temp = strand;
+			for (String s: strand){
+				String index = s.substring(0, 1);
+				if (!mmfs.get(index).getPrecursors().isEmpty()){
+					s = mmfs.get(index).getPrecursors().get(0).getId() + s;
+				}
+				newStrand.add(s);
+			}
+			strand = newStrand;
+		} while(!temp.equals(newStrand));
+		for (String s: strand){
+			boolean exist = false;
+			for (String t : strand){
+				if (s.equals(t)) continue;
+				if (t.contains(s)){
+					exist = true;
+					break;
+				}
+			}
+			if (!exist){
+				strands.add(s);
+			}
+		}
+		for (Map.Entry<String, MMF> mmf : mmfs.entrySet()){
+			for (String s : strands){
+				if (s.contains(mmf.getKey())){
+					mmf.getValue().setStrand(strands.indexOf(s)+1);
+					break;
+				}
+			}
+		}
+		
 	}
 	
 

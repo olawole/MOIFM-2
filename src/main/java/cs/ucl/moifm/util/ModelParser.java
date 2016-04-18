@@ -36,6 +36,7 @@ public class ModelParser {
 	    	project.add(mmf);
 	    	project.setPeriods(cashvalue.size());
 	     }
+	    
 	  
 	  
 	}
@@ -48,6 +49,6 @@ public class ModelParser {
 				project.getMmfs().get(nextLine[0]).addPrecursor(project.getMmfs().get(nextLine[1]));
 		}
 		
-		
+		project.setStrands();
 	}
 }

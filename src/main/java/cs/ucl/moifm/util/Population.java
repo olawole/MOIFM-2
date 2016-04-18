@@ -32,11 +32,15 @@ public class Population {
 			while (counter < populationSize){
 				DeliverySequence newSequence = new DeliverySequence();
 				newSequence.generateIndividuals(proj);
+//				if (proj.getMaxMmfsPerPeriod() > 1)
+//					newSequence.convertSequence(proj);
 				while(Population.archive.contains(newSequence.toString())){
 					Collections.shuffle(newSequence.getSequence());
 				}
 				if (newSequence.isValidSequence(proj)){
-					newSequence.setFitness(proj);
+					//if (proj.getMaxMmfsPerPeriod() > 1)
+					//	newSequence.convertSequence(proj);
+					newSequence.setFitnes(proj);
 					saveSequence(counter++, newSequence);
 					Population.archive.add(newSequence.toString());
 				}
