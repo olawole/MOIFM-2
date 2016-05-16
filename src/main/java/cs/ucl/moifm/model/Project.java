@@ -46,7 +46,7 @@ public class Project implements PropertyChangeListener {
         this.interestRate = 0.0241;
         this.nextId = "A";
         this.mmfs = new LinkedHashMap<String, MMF>();
-        this.maxMmfsPerPeriod = 2;
+        this.maxMmfsPerPeriod = 1;
         this.budgetConstraint = 0.0;
         this.sanpv = new HashMap<String, Double[]>();
         this.changeSupport = new PropertyChangeSupport(this);

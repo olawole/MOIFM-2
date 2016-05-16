@@ -38,8 +38,8 @@ public class Main {
 		// TODO Auto-generated method stub
 		try {
 			long startTime = System.currentTimeMillis();
-			CSVReader reader = new CSVReader(new FileReader("input3.csv"));
-			CSVReader precedenceReader = new CSVReader(new FileReader("precedence3.csv"));
+			CSVReader reader = new CSVReader(new FileReader("input2.csv"));
+			CSVReader precedenceReader = new CSVReader(new FileReader("precedence2.csv"));
 			 Project project = new Project();
 			 ModelParser.fileToModelParser(reader, project);
 			 ModelParser.convertFileToPrecedence(precedenceReader, project);
