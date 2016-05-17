@@ -36,7 +36,7 @@ public class ModelParser {
 	    	project.add(mmf);
 	    	project.setPeriods(cashvalue.size());
 	     }
-	    
+	    project.setFeatures();
 	  
 	  
 	}

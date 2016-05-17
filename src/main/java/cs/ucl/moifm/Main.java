@@ -43,7 +43,7 @@ public class Main {
 			 Project project = new Project();
 			 ModelParser.fileToModelParser(reader, project);
 			 ModelParser.convertFileToPrecedence(precedenceReader, project);
-			 
+			 System.out.println(project.getFeatures().toString());
 			// DeliverySequence dseq = new DeliverySequence();
 			// dseq.setSequence(project);
 			// project.setSanpv();

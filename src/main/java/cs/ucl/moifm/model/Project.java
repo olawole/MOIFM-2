@@ -25,6 +25,7 @@ public class Project implements PropertyChangeListener {
     private int periods;
     private double interestRate;
     private LinkedHashMap<String, MMF> mmfs;
+    private List<String> features;
     private HashMap<String, Double[]> sanpv;
     private HashMap<String, Double[][]> simCashflow;
     private HashMap<String, Double[][]> simSanpv;
@@ -52,6 +53,7 @@ public class Project implements PropertyChangeListener {
         this.changeSupport = new PropertyChangeSupport(this);
         this.nOfSim = 10000;
         this.strands = new ArrayList<String>();
+        this.features = new ArrayList<String>();
     }
     
     public String getName() {
@@ -353,6 +355,22 @@ public class Project implements PropertyChangeListener {
 			}
 		}
 		
+	}
+
+	/**
+	 * @return the features
+	 */
+	public List<String> getFeatures() {
+		return features;
+	}
+
+	/**
+	 * @param features the features to set
+	 */
+	public void setFeatures() {
+		for (String s : mmfs.keySet()){
+			features.add(s);
+		}
 	}
 	
 
