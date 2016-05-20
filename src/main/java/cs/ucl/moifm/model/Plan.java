@@ -1,7 +1,13 @@
 package cs.ucl.moifm.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 public class Plan {
 	// Representation of the plan for genetic manipulation
@@ -18,25 +24,203 @@ public class Plan {
 	
 	double expectedROI;
 	
-	int domCount;
+	public int domCount;
 	
 	double minNPV, maxNPV, minCost, maxCost;
 	
-	List<Plan> domSet;
+	public List<Plan> domSet;
 	
-	int rank;
+	public int rank;
 	
-	double crowdingDistance;
+	public double crowdingDistance;
 	
-	//Default Constructor
+	List<String> featureVector;
 	
-	public Plan(){
-		this.chromosome = new ArrayList<Integer>();
+	//Constructor
+	
+	public Plan(int size, Project project){
+		this.chromosome = new ArrayList<Integer>(Collections.nCopies(size, 0));
 		this.expectedCost = 0;
 		this.expectedNPV = 0;
 		this.expectedROI = 0;
 		this.investmentRisk = 0;
 		this.domSet = new ArrayList<Plan>();
+		this.featureVector = project.getFeatures();
 	}
+	
+	public List<Integer> getChromosome(){
+		return chromosome;
+	}
+	
+	/**
+     * Get the net present value generated from the sequence
+     * 
+     */
+	public double getExpectedNPV() {
+		return expectedNPV;
+	}
+	
+	/**
+     * Sets the revenue to be generated from implementing the sequence
+     * 
+     * @param expectedPresentValue
+     */
+	public void setExpectedNPV(double expectedPresentValue) {
+		this.expectedNPV = expectedPresentValue;
+	}
+	
+	public double getInvestmentRisk() {
+		return investmentRisk;
+	}
+
+	public void setInvestmentRisk(double investmentRisk) {
+		this.investmentRisk = investmentRisk;
+	}
+	
+	public double getExpectedROI() {
+		return expectedROI;
+	}
+
+	public void setExpectedROI(double expectedROI) {
+		this.expectedROI = expectedROI;
+	}
+	
+	/**
+     * Get the expected cost to implement features in the delivery sequence
+     */
+	public double getExpectedCost() {
+		return expectedCost;
+	}
+	
+	/**
+     * Sets the cost of implementing the sequence
+     * 
+     * @param expectedCost
+     */
+	public void setExpectedCost(double expectedCost) {
+		this.expectedCost = expectedCost;
+	}
+	
+	public void evaluateFitness(Project project){
+		Double[] npv = new Double[project.nOfSim];
+		Double[] cost = new Double[project.nOfSim];
+		HashMap<Integer, String> plan = this.transformPlan();
+		
+		for (int k = 0; k < project.nOfSim; k++){
+			npv[k] = cost[k] = 0.0;
+			for (Map.Entry<Integer, String> entry : plan.entrySet()){
+				int currentPeriod = entry.getKey();
+				if (currentPeriod >= project.getPeriods()){
+					System.out.println(currentPeriod);
+				}
+				String[] features = entry.getValue().split(",");
+				//get investment cost
+				
+				for (String feature : features){
+					int j = 0;
+					while(project.getSimCashflow().get(feature)[k][j] < 0){
+						
+						cost[k] += getDiscountedValue(project.getInterestRate(), currentPeriod+j, 
+								project.getSimCashflow().get(feature)[k][j]);
+						j++;
+					}
+					
+					//value of the feature
+					npv[k] += project.getSimSanpv().get(feature)[k][currentPeriod-1];
+				}
+				
+			}
+		}
+		//Compute expected npv, expected cost and investment risk
+		
+				DescriptiveStatistics statsCost = new DescriptiveStatistics();
+				DescriptiveStatistics statsNpv = new DescriptiveStatistics();
+
+				
+				for (int i = 0; i < project.nOfSim; i++){
+					statsNpv.addValue(npv[i]);
+					statsCost.addValue(cost[i]);
+				}
+				
+				expectedCost = statsCost.getMean();
+				minCost = statsCost.getMin();
+				maxCost = statsCost.getMax();
+				expectedNPV = statsNpv.getMean();
+				minNPV = statsNpv.getMin();
+				maxNPV = statsNpv.getMax();
+				double npvSD = statsNpv.getStandardDeviation();
+				investmentRisk = Math.abs(expectedNPV / npvSD);
+				expectedROI = (expectedNPV / Math.abs(expectedCost)) * 100;
+	}
+	
+	public void generatePlan(Project project){	
+		int noOfFeatures = featureVector.size();
+		int startedFeatures = 0;
+		int unstartedFeatures = noOfFeatures;
+		List<Integer> indexAdded = new ArrayList<Integer>();
+		int period = 0;
+		while(period <= project.getPeriods() && startedFeatures < noOfFeatures){
+			period++;
+			int randIndex;
+			int noOfFeaturesInPeriod = (int) Math.round(Math.random() * unstartedFeatures);
+			for (int i = 0; i < noOfFeaturesInPeriod; i++){
+				do{
+					randIndex = (int) (Math.random() * noOfFeatures);
+				} while(indexAdded.contains(randIndex));
+				chromosome.remove(randIndex);
+				chromosome.add(randIndex, period);
+				
+				indexAdded.add(randIndex);
+			}
+			startedFeatures += noOfFeaturesInPeriod;
+			unstartedFeatures -= noOfFeaturesInPeriod;
+		}
+		
+	}
+	
+	public HashMap<Integer, String> transformPlan(){
+		HashMap<Integer, String> decodedPlan = new HashMap<Integer, String>();
+		for (int i = 0; i < chromosome.size(); i++){
+			String feature = featureVector.get(i);
+			int gene = chromosome.get(i);
+			if (decodedPlan.containsKey(gene)){
+				String value = decodedPlan.get(gene) + "," + feature;
+				decodedPlan.put(gene, value);
+			}
+			else {
+				decodedPlan.put(gene, feature);
+			}
+		}
+		return decodedPlan;
+	}
+	
+	public boolean isValidPlan(Project project){
+		boolean isValid = true;
+		
+		//for each feature in featurevector
+		for (int i = 0; i < chromosome.size(); i++){
+			String featureId = featureVector.get(i);
+			String precursor = project.getMmfs().get(featureId).getPrecursorString();
+			if (precursor == ""){
+				continue;
+			}
+			int precursorIndex = featureVector.indexOf(precursor);
+			if (chromosome.get(i) <= chromosome.get(precursorIndex)){
+				return false;
+			}
+		}
+		//get the precursor
+		//compare the position of both feature to ensure that
+		//precedence relationship is preserved
+		return isValid;
+	}
+	
+	public Double getDiscountedValue(double interestRate, int period, Double value){
+    	if (period < 1) {
+            throw new IllegalArgumentException("Invalid startPeriod: "
+                    + period);
+        }  	
+    	return value / Math.pow(interestRate + 1, period);
+    }
 	
 }

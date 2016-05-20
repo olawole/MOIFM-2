@@ -5,22 +5,23 @@ import java.util.Collections;
 import java.util.List;
 
 import cs.ucl.moifm.model.DeliverySequence;
+import cs.ucl.moifm.model.Plan;
 
 public class Front {
 	
-	public List<DeliverySequence> members;
+	public List<Plan> members;
 	private static final String[] OBJECTIVES = {"ENPV", "ECOST","RISK"};
 	
 	int rank;
 	
 	public Front(int rank){
-		members = new ArrayList<DeliverySequence>();
+		members = new ArrayList<Plan>();
 		this.rank = rank;
 	}
 	
 	public void crowdingDistance() {
 		int l = members.size();
-		for (DeliverySequence d : members){
+		for (Plan d : members){
 			d.crowdingDistance = 0;
 		}
 		for (String obj : OBJECTIVES){

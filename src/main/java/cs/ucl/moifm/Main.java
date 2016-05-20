@@ -7,6 +7,7 @@ import com.opencsv.*;
 
 import cs.ucl.moifm.model.DeliverySequence;
 import cs.ucl.moifm.model.MMFException;
+import cs.ucl.moifm.model.Plan;
 import cs.ucl.moifm.model.Project;
 import cs.ucl.moifm.util.Front;
 import cs.ucl.moifm.util.Genetic;
@@ -26,8 +27,8 @@ import java.util.Random;
  */
 public class Main {
 	
-	public static final int NO_GENERATION = 30;
-	public static final int POP_SIZE = 30;
+	public static final int NO_GENERATION = 5;
+	public static final int POP_SIZE = 20;
 
 	/**
 	 * @param args
@@ -43,13 +44,23 @@ public class Main {
 			 Project project = new Project();
 			 ModelParser.fileToModelParser(reader, project);
 			 ModelParser.convertFileToPrecedence(precedenceReader, project);
-			 System.out.println(project.getFeatures().toString());
-			// DeliverySequence dseq = new DeliverySequence();
-			// dseq.setSequence(project);
-			// project.setSanpv();
 			 MCSimulation simu = new MCSimulation(project.getPeriods());
 			 simu.simulate(project);
 			 simu.simulate_sanpv(project.getSimCashflow(), project);
+//			 System.out.println(project.getFeatures().toString());
+//			 Plan p = new Plan(project.getFeatures().size(), project);
+//			 for (int i=0; i<100;i++){
+//				 do{
+//				 p.generatePlan(project);
+//				 } while (!p.isValidPlan(project));
+//				 p.evaluateFitness(project);
+//				 System.out.println(p.getChromosome().toString());
+//				 System.out.println(p.transformPlan().toString());
+//				 System.out.println("Cost = "+ p.getExpectedCost());
+//				 System.out.println("Value = " + p.getExpectedNPV());
+//
+//			 }
+			 
 			 
 			/* Double value[][] = project.getSimCashflow().get("A");
 			 Double sanpv[][] = project.getSimSanpv().get("A");
@@ -79,7 +90,7 @@ public class Main {
 			 Front pareto = pop.fastNonDominatedSort().get(0);
 			 pareto.sortNpv(0, pareto.members.size() - 1);
 			 for (int i = 0; i < pareto.members.size(); i++){
-				 System.out.println(pareto.members.get(i) + "\tENPV = " + pareto.members.get(i).getExpectedNPV()
+				 System.out.println(pareto.members.get(i).transformPlan().toString() + "\tENPV = " + pareto.members.get(i).getExpectedNPV()
 						 + "\tECOST = " + pareto.members.get(i).getExpectedCost() + "\tRisk = " + 
 						 pareto.members.get(i).getInvestmentRisk() + "\tEROI = " + pareto.members.get(i).getExpectedROI());
 			//	 pop.dSequence.get(i).setFitness(project);

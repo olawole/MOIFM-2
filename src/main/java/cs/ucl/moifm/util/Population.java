@@ -5,11 +5,12 @@ import java.util.Collections;
 import java.util.List;
 
 import cs.ucl.moifm.model.DeliverySequence;
+import cs.ucl.moifm.model.Plan;
 import cs.ucl.moifm.model.Project;
 
 public class Population {
 	
-	public List<DeliverySequence> dSequence;
+	public List<Plan> plans;
 	
 	public static List<String> archive = new ArrayList<String>();
 	public static List<String> invalid = new ArrayList<String>();
@@ -24,35 +25,36 @@ public class Population {
 	 *  @param initialize
 	 */
 	public Population(int populationSize, Project proj, boolean initialize){
-		dSequence = new ArrayList<DeliverySequence>();
+		plans = new ArrayList<Plan>(populationSize);
 	//	Population.archive = new ArrayList<String>();
 		this.project = proj;
 		if (initialize && proj != null){
 			int counter = 0;
 			while (counter < populationSize){
-				DeliverySequence newSequence = new DeliverySequence();
-				newSequence.generateIndividuals(proj);
-//				if (proj.getMaxMmfsPerPeriod() > 1)
-//					newSequence.convertSequence(proj);
-				while(Population.archive.contains(newSequence.toString())){
-					Collections.shuffle(newSequence.getSequence());
-				}
-				if (newSequence.isValidSequence(proj)){
-					//if (proj.getMaxMmfsPerPeriod() > 1)
-					//	newSequence.convertSequence(proj);
-					newSequence.setFitnes(proj);
-					saveSequence(counter++, newSequence);
-					Population.archive.add(newSequence.toString());
-				}
-				else {
-					Population.invalid.add(newSequence.toString());
-				}
+				Plan newPlan = new Plan(proj.getFeatures().size(), proj);
+				do{
+					newPlan.generatePlan(proj);
+				} while (!newPlan.isValidPlan(proj) || Population.archive.contains(newPlan.toString()));
+				newPlan.evaluateFitness(project);
+				savePlan(counter++, newPlan);
+				Population.archive.add(newPlan.toString());
+//				while(Population.archive.contains(newSequence.toString())){
+//					Collections.shuffle(newSequence.getSequence());
+//				}
+//				if (newSequence.isValidSequence(proj)){
+//					newSequence.setFitnes(proj);
+//					saveSequence(counter++, newSequence);
+//					Population.archive.add(newSequence.toString());
+//				}
+//				else {
+//					Population.invalid.add(newSequence.toString());
+//				}
 			}
 		}
 	}
 	
 	public Population(int populationSize){
-		dSequence = new ArrayList<DeliverySequence>(populationSize);
+		//dSequence = new ArrayList<DeliverySequence>(populationSize);
 	}
 	
 	/*
@@ -62,25 +64,25 @@ public class Population {
 	 * @param newSequence
 	 * 
 	 */
-	public void saveSequence(int index, DeliverySequence newSequence) {
-		dSequence.add(index, newSequence);
+	public void savePlan(int index, Plan newPlan) {
+		plans.add(index, newPlan);
 	}
 	
-	public List<DeliverySequence> getFittestSequences(){
-		List<DeliverySequence> nonDominated = new ArrayList<DeliverySequence>();
+	public List<Plan> getFittestPlans(){
+		List<Plan> nonDominated = new ArrayList<Plan>();
 		boolean pareto;
 		
-		for (int i = 0; i < dSequence.size(); i++){
+		for (int i = 0; i < plans.size(); i++){
 			pareto = true;
-			for (int j = 0; j < dSequence.size(); j++){
+			for (int j = 0; j < plans.size(); j++){
 				if (i == j) continue;
-				if (dominates(dSequence.get(j), dSequence.get(i))){
+				if (dominates(plans.get(j), plans.get(i))){
 					pareto = false;
 					break;
 				}
 			}
 			if (pareto)
-				nonDominated.add(dSequence.get(i));
+				nonDominated.add(plans.get(i));
 		}
 		return nonDominated;
 	}
@@ -90,10 +92,10 @@ public class Population {
 		List<Front> fronts = new ArrayList<Front>(5);
 		Front first = new Front(0);
 		
-		for (DeliverySequence p : dSequence){
+		for (Plan p : plans){
 			p.domCount = 0;
 			p.domSet.clear();
-			for (DeliverySequence q : dSequence){
+			for (Plan q : plans){
 				if (dominates(p,q)){
 					p.domSet.add(q);
 				}
@@ -111,8 +113,8 @@ public class Population {
 		int i = 0;
 		while (i < fronts.size() && !fronts.get(i).members.isEmpty()){
 			Front nextFront = new Front(i+1);
-			for (DeliverySequence p : fronts.get(i).members){
-				for (DeliverySequence q : p.domSet){
+			for (Plan p : fronts.get(i).members){
+				for (Plan q : p.domSet){
 					q.domCount = q.domCount - 1;
 					if (q.domCount == 0){
 						q.rank = i + 1;
@@ -129,12 +131,12 @@ public class Population {
 
 	}
 	
-	public boolean dominates (DeliverySequence s1, DeliverySequence s2){
+	public boolean dominates (Plan plan, Plan plan2){
 		boolean dominate = false;
 		
-		if (s1.getExpectedCost() >= s2.getExpectedCost() &&
-				s1.getExpectedNPV() >= s2.getExpectedNPV() &&
-				s1.getInvestmentRisk() <= s2.getInvestmentRisk()){
+		if (plan.getExpectedCost() >= plan2.getExpectedCost() &&
+				plan.getExpectedNPV() >= plan2.getExpectedNPV() &&
+				plan.getInvestmentRisk() <= plan2.getInvestmentRisk()){
 			dominate = true;
 		}
 		
