@@ -34,7 +34,7 @@ public class Plan {
 	
 	public double crowdingDistance;
 	
-	List<String> featureVector;
+	public List<String> featureVector;
 	
 	//Constructor
 	
@@ -46,6 +46,10 @@ public class Plan {
 		this.investmentRisk = 0;
 		this.domSet = new ArrayList<Plan>();
 		this.featureVector = project.getFeatures();
+	}
+	
+	public void setChromosome(List<Integer> chromosome){
+		this.chromosome = chromosome;
 	}
 	
 	public List<Integer> getChromosome(){
@@ -213,6 +217,14 @@ public class Plan {
 		//compare the position of both feature to ensure that
 		//precedence relationship is preserved
 		return isValid;
+	}
+	
+	public String toString(){
+		String newString = "";
+		for (Integer s : chromosome){
+			newString += s;
+		}
+		return newString;
 	}
 	
 	public Double getDiscountedValue(double interestRate, int period, Double value){

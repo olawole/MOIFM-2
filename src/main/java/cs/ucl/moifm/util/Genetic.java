@@ -15,7 +15,7 @@ public class Genetic {
 	public static int crossOverNumber = 0;
 	//private static final int TOURNAMENT_SIZE = 3;
 	//private static final boolean ELITISM = true;
-	private static final int POPULATION_SIZE = 20;
+	public static final int POPULATION_SIZE = 50;
 	
 	public static Population evolvePopulation(Population pop){
 		//System.out.println("Enter Evolve");

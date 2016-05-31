@@ -34,13 +34,10 @@ public class Population {
 				Plan newPlan = new Plan(proj.getFeatures().size(), proj);
 				do{
 					newPlan.generatePlan(proj);
-				} while (!newPlan.isValidPlan(proj) || Population.archive.contains(newPlan.toString()));
+				} while (!(newPlan.isValidPlan(proj)) && !Population.archive.contains(newPlan.toString()));
 				newPlan.evaluateFitness(project);
 				savePlan(counter++, newPlan);
 				Population.archive.add(newPlan.toString());
-//				while(Population.archive.contains(newSequence.toString())){
-//					Collections.shuffle(newSequence.getSequence());
-//				}
 //				if (newSequence.isValidSequence(proj)){
 //					newSequence.setFitnes(proj);
 //					saveSequence(counter++, newSequence);

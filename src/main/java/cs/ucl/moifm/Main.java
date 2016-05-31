@@ -19,7 +19,10 @@ import org.apache.commons.math3.distribution.TriangularDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 /**
  * @author Olawole
@@ -27,8 +30,11 @@ import java.util.Random;
  */
 public class Main {
 	
-	public static final int NO_GENERATION = 5;
-	public static final int POP_SIZE = 20;
+	public static final int NO_GENERATION = 30;
+	public static final int POP_SIZE = Genetic.POPULATION_SIZE;
+	public static final String HEADER = "Plan,Expected NPV, Expected Cost, Investment Risk";
+	public static final String COMMA_SEPERATOR = ",";
+	public static final String LINE_SEPERATOR = "\n";
 
 	/**
 	 * @param args
@@ -47,37 +53,10 @@ public class Main {
 			 MCSimulation simu = new MCSimulation(project.getPeriods());
 			 simu.simulate(project);
 			 simu.simulate_sanpv(project.getSimCashflow(), project);
-//			 System.out.println(project.getFeatures().toString());
-//			 Plan p = new Plan(project.getFeatures().size(), project);
-//			 for (int i=0; i<100;i++){
-//				 do{
-//				 p.generatePlan(project);
-//				 } while (!p.isValidPlan(project));
-//				 p.evaluateFitness(project);
-//				 System.out.println(p.getChromosome().toString());
-//				 System.out.println(p.transformPlan().toString());
-//				 System.out.println("Cost = "+ p.getExpectedCost());
-//				 System.out.println("Value = " + p.getExpectedNPV());
-//
-//			 }
-			 
-			 
-			/* Double value[][] = project.getSimCashflow().get("A");
-			 Double sanpv[][] = project.getSimSanpv().get("A");
-			 Double[] val = value[0];
-			 Double[] val2 = sanpv[0];
-			 for (int i = 0; i < val.length; i++)
-				 System.out.print(val[i] + " ");
-			 System.out.println("\n");
-			 for (int i = 0; i < val2.length; i++)
-				 System.out.print(val2[i] + " ");
-			/* for (int i = 0; i < 100; i++){
-				 for (int j = 0; j < project.getPeriods(); j++){
-					 System.out.print(value[i][j] + " ");
-				 }
-				 System.out.println("\n");
-			 }
-			 */
+			 Plan test = new Plan(9, project);
+			 List<Integer> chromosome = Arrays.asList(2,3,4,7,3,4,1,5,2);
+			 test.setChromosome(chromosome);
+			 System.out.println(test.isValidPlan(project));
 			 Population pop = new Population(POP_SIZE, project, true);			 
 			 for (int i = 0; i < NO_GENERATION; i++){
 				 System.out.println("Generation " + (i+1));
@@ -90,7 +69,7 @@ public class Main {
 			 Front pareto = pop.fastNonDominatedSort().get(0);
 			 pareto.sortNpv(0, pareto.members.size() - 1);
 			 for (int i = 0; i < pareto.members.size(); i++){
-				 System.out.println(pareto.members.get(i).transformPlan().toString() + "\tENPV = " + pareto.members.get(i).getExpectedNPV()
+				 System.out.println(pareto.members.get(i).toString()+pareto.members.get(i).transformPlan().toString() + "\tENPV = " + pareto.members.get(i).getExpectedNPV()
 						 + "\tECOST = " + pareto.members.get(i).getExpectedCost() + "\tRisk = " + 
 						 pareto.members.get(i).getInvestmentRisk() + "\tEROI = " + pareto.members.get(i).getExpectedROI());
 			//	 pop.dSequence.get(i).setFitness(project);
@@ -98,6 +77,20 @@ public class Main {
 			 System.out.println("Solutions Explored = " + Population.archive.size());
 			 System.out.println("Mutation = " + Genetic.mutationNumber);
 			 System.out.println("Crossover = " + Genetic.crossOverNumber);
+			 FileWriter output = new FileWriter("output.csv");
+			 output.append(HEADER.toString());
+			 output.append(LINE_SEPERATOR);
+			 for (int i = 0; i < pareto.members.size(); i++){
+				 output.append(pareto.members.get(i).transformPlan().toString());
+				 output.append(COMMA_SEPERATOR);
+				 output.append(String.valueOf(pareto.members.get(i).getExpectedNPV()));
+				 output.append(COMMA_SEPERATOR);
+				 output.append(String.valueOf(pareto.members.get(i).getExpectedCost()));
+				 output.append(COMMA_SEPERATOR);
+				 output.append(String.valueOf(pareto.members.get(i).getInvestmentRisk()));
+				 output.append(LINE_SEPERATOR);
+			 }
+			 output.close();
 			 reader.close();
 			 precedenceReader.close(); 
 			 long runtime = System.currentTimeMillis() - startTime;
