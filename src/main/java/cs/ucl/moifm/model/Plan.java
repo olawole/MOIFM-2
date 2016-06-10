@@ -232,15 +232,19 @@ public class Plan {
 		
 		//for each feature in featurevector
 		for (int i = 0; i < chromosome.size(); i++){
+			if (chromosome.get(i) == 0){
+				continue;
+			}
 			String featureId = featureVector.get(i);
 			String precursor = project.getMmfs().get(featureId).getPrecursorString();
 			if (precursor == ""){
 				continue;
 			}
 			int precursorIndex = featureVector.indexOf(precursor);
-			if (chromosome.get(precursorIndex) == 0){
-				return false;
-			}
+//			if (chromosome.get(precursorIndex) == 0){
+//				return false;
+//			}
+			
 			if (chromosome.get(i) < chromosome.get(precursorIndex)){
 				return false;
 			}
@@ -253,17 +257,7 @@ public class Plan {
 		return isValid;
 	}
 	
-//	public void enforcePrecedence(){
-//		for(int i = 0; i < chromosome.size();i++){
-//			if (chromosome.get(i) == 0){
-//				continue;
-//			}
-//			else {
-//				String featureId = featureVector.get(i);
-//				String precursor = project.getMmfs().get(featureId).getPrecursorString();
-//			}
-//		}
-//	}
+
 	public String toString(){
 		String newString = "";
 		for (Integer s : chromosome){

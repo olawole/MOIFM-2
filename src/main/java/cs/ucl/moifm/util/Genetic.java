@@ -123,6 +123,8 @@ public class Genetic {
 				child = crossover(parent_1, parent_2,pop.project);
 				mutate(child);
 			} while (!(child.isValidPlan(pop.project)) || Population.archive.contains(child.toString()));
+			if(child.getChromosome().contains(0))
+				repairChromosome(child, pop.project);
 			child.evaluateFitness(pop.project);
 			children.savePlan(i, child);
 			Population.archive.add(child.toString());
@@ -173,5 +175,26 @@ public class Genetic {
 			return (candidate1.crowdingDistance > candidate2.crowdingDistance);
 		else
 			return (candidate1.rank < candidate2.rank);
+	}
+	
+	public static void repairChromosome(Plan plan, Project project){
+		for(int i = 0; i < plan.getChromosome().size();i++){
+			if (plan.getChromosome().get(i) == 0){
+				continue;
+			}
+			else {
+				String featureId = plan.featureVector.get(i);
+				String precursor = project.getMmfs().get(featureId).getPrecursorString();
+				if (precursor == ""){
+					continue;
+				}
+				int precursorIndex = plan.featureVector.indexOf(precursor);
+				
+				if(plan.getChromosome().get(precursorIndex) == 0){
+					plan.getChromosome().remove(i);
+					plan.getChromosome().add(i, 0);
+				}
+			}
+		}
 	}
 }
