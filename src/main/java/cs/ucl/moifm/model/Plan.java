@@ -109,29 +109,39 @@ public class Plan {
 		Double[] npv = new Double[project.nOfSim];
 		Double[] cost = new Double[project.nOfSim];
 		HashMap<Integer, String> plan = this.transformPlan();
-		
+						
 		for (int k = 0; k < project.nOfSim; k++){
 			npv[k] = cost[k] = 0.0;
+			List<String> executedFeatures = new ArrayList<String>();
 			for (Map.Entry<Integer, String> entry : plan.entrySet()){
 				int currentPeriod = entry.getKey();
-				if (currentPeriod >= project.getPeriods()){
-					System.out.println(currentPeriod);
-				}
+				double periodRevenue = 0;
+				double periodInvestment ;
+				if (currentPeriod == 0)
+					continue;
 				String[] features = entry.getValue().split(",");
 				//get investment cost
-				
+				if (!executedFeatures.isEmpty()){
+					for (String deliveredFeature : executedFeatures){
+						Double value = project.getSimCashflow().get(deliveredFeature)[k][currentPeriod-1];
+						periodRevenue += getDiscountedValue(project.getInterestRate(), currentPeriod, value);
+					}
+				}
 				for (String feature : features){
 					int j = 0;
 					while(project.getSimCashflow().get(feature)[k][j] < 0){
-						
-						cost[k] += getDiscountedValue(project.getInterestRate(), currentPeriod+j, 
+						periodInvestment = getDiscountedValue(project.getInterestRate(), currentPeriod+j, 
 								project.getSimCashflow().get(feature)[k][j]);
+						periodInvestment += periodRevenue;
+						cost[k] += (periodInvestment < 0) ? periodInvestment: 0;
 						j++;
 					}
 					
 					//value of the feature
 					npv[k] += project.getSimSanpv().get(feature)[k][currentPeriod-1];
+					executedFeatures.add(feature);
 				}
+				
 				
 			}
 		}
@@ -163,7 +173,7 @@ public class Plan {
 		int unstartedFeatures = noOfFeatures;
 		List<Integer> indexAdded = new ArrayList<Integer>();
 		int period = 0;
-		while(period <= project.getPeriods() && startedFeatures < noOfFeatures){
+		while(period < project.getPeriods() && startedFeatures < noOfFeatures){
 			period++;
 			int randIndex;
 			int noOfFeaturesInPeriod = (int) Math.round(Math.random() * unstartedFeatures);
@@ -198,7 +208,7 @@ public class Plan {
 		return decodedPlan;
 	}
 	
-	public boolean isValidPlan(Project project){
+	public boolean isValidPlan1(Project project){
 		boolean isValid = true;
 		
 		//for each feature in featurevector
@@ -213,12 +223,47 @@ public class Plan {
 				return false;
 			}
 		}
-		//get the precursor
-		//compare the position of both feature to ensure that
-		//precedence relationship is preserved
+		// if 
 		return isValid;
 	}
 	
+	public boolean isValidPlan(Project project){
+		boolean isValid = true;
+		
+		//for each feature in featurevector
+		for (int i = 0; i < chromosome.size(); i++){
+			String featureId = featureVector.get(i);
+			String precursor = project.getMmfs().get(featureId).getPrecursorString();
+			if (precursor == ""){
+				continue;
+			}
+			int precursorIndex = featureVector.indexOf(precursor);
+			if (chromosome.get(precursorIndex) == 0){
+				return false;
+			}
+			if (chromosome.get(i) < chromosome.get(precursorIndex)){
+				return false;
+			}
+			else if (chromosome.get(i) == chromosome.get(precursorIndex)){
+				if (chromosome.get(i) != 0)
+					return false;
+			}
+		}
+		// if 
+		return isValid;
+	}
+	
+//	public void enforcePrecedence(){
+//		for(int i = 0; i < chromosome.size();i++){
+//			if (chromosome.get(i) == 0){
+//				continue;
+//			}
+//			else {
+//				String featureId = featureVector.get(i);
+//				String precursor = project.getMmfs().get(featureId).getPrecursorString();
+//			}
+//		}
+//	}
 	public String toString(){
 		String newString = "";
 		for (Integer s : chromosome){
@@ -234,5 +279,11 @@ public class Plan {
         }  	
     	return value / Math.pow(interestRate + 1, period);
     }
+	
+	public Double[][] cashFlowAnalysis(HashMap<Integer, String> plan){
+		Double [][] cFlow = new Double[featureVector.size()+2][];
+		
+		return cFlow;
+	}
 	
 }

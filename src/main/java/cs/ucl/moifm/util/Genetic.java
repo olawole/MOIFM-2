@@ -1,9 +1,9 @@
 package cs.ucl.moifm.util;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import cs.ucl.moifm.model.DeliverySequence;
 import cs.ucl.moifm.model.Plan;
 import cs.ucl.moifm.model.Project;
 
@@ -11,46 +11,61 @@ public class Genetic {
 	
 	//parameters
 	private static final double MUTATION_RATE = 1.0 / 9.0;
+	public static final String[] MUTATION_OPERATOR = new String[]{"flipzero","swap","flipnonzero"};
 	public static int mutationNumber = 0;
 	public static int crossOverNumber = 0;
-	//private static final int TOURNAMENT_SIZE = 3;
-	//private static final boolean ELITISM = true;
-	public static final int POPULATION_SIZE = 50;
+	public static final int POPULATION_SIZE = 100;
+	public static List<Plan> allSolution = new ArrayList<Plan>();
 	
 	public static Population evolvePopulation(Population pop){
-		//System.out.println("Enter Evolve");
 		Population newPopulation = new Population(POPULATION_SIZE, pop.project, false);
 		Population children = new Population(POPULATION_SIZE, pop.project, false);
 		children = reproduce(pop);
 		newPopulation = selection(pop, children);
-			
-		//System.out.println("Exit Evolve");
 		return newPopulation;
 	}
 
 	// Mutate a sequence using swap mutation
-	private static void mutate(Plan child) {
-		// Loop through Chromosome
-		for (int pos1 = 0; pos1 < child.getChromosome().size(); pos1++){
-			// Apply mutation
-			if (Math.random() < MUTATION_RATE){
-				mutationNumber += 1;
-				// Get another random position
-				int pos2 = (int) (child.getChromosome().size() * Math.random());
-				Collections.swap(child.getChromosome(), pos1, pos2);
-			}
+	public static void mutate(Plan child) {
+		if (Math.random() < MUTATION_RATE){
+		int opIndex = (int)(Math.random() * MUTATION_OPERATOR.length);
+		switch (MUTATION_OPERATOR[opIndex]){
+		case "flipzero":
+			mutationNumber += 1;
+			int mutPoint = (int) (child.getChromosome().size() * Math.random());
+			child.getChromosome().remove(mutPoint);
+			child.getChromosome().add(mutPoint, 0);
+			break;
+		case "swap":
+			mutationNumber += 1;
+			int pos1 = (int) (child.getChromosome().size() * Math.random());
+			int pos2 = (int) (child.getChromosome().size() * Math.random());
+			Collections.swap(child.getChromosome(), pos1, pos2);
+			break;
+		case "flipnonzero":
+			mutationNumber += 1;
+			int point = (int) (child.getChromosome().size() * Math.random());
+			child.getChromosome().remove(point);
+			child.getChromosome().add(point, point);
+			break;
 		}
-		
+		// Loop through Chromosome
+//		for (int pos1 = 0; pos1 < child.getChromosome().size(); pos1++){
+//			// Apply mutation
+//			if (Math.random() < MUTATION_RATE){
+//				mutationNumber += 1;
+//				// Get another random position
+//				int pos2 = (int) (child.getChromosome().size() * Math.random());
+//				Collections.swap(child.getChromosome(), pos1, pos2);
+//			}
+//		}
+		}
 	}
 
-	private static Plan crossover(Plan parent_1,
+	public static Plan crossover(Plan parent_1,
 			Plan parent_2, Project project) {
 		Plan child = new Plan(project.getFeatures().size(), project);
 		int startPos, endPos;
-//		for(int k = 0; k < parent_1.getChromosome().size(); k++){
-//			child.getChromosome().add(null);
-//		}
-		// Get the start and end subsequence for parent 1 sequence
 		do {
 			startPos = (int) (Math.random() * parent_1.getChromosome().size());
 			endPos = (int) (Math.random() * parent_1.getChromosome().size());
@@ -74,15 +89,8 @@ public class Genetic {
 		for (int i = 0; i < parent_2.getChromosome().size(); i++){
 			// if child doesn't have the MMF add it
 			if (child.getChromosome().get(i) == 0){
-				//loop through to find a spare position in the child sequence
-				//for(int ii = 0; ii < child.getChromosome().size(); ii++){
-					//if(child.getChromosome().get(ii) == 0){
-						child.getChromosome().remove(i);
-						child.getChromosome().add(i, parent_2.getChromosome().get(i));
-					//	break;
-					//}
-				//}
-				
+				child.getChromosome().remove(i);
+				child.getChromosome().add(i, parent_2.getChromosome().get(i));
 			}
 		}
 		++crossOverNumber;
@@ -106,7 +114,6 @@ public class Genetic {
 	}
 	
 	public static Population reproduce(Population pop){
-		//System.out.println("Enter Reporoduce");
 		Population children = new Population(POPULATION_SIZE, pop.project, false);
 		for (int i = 0; i < POPULATION_SIZE; i++){
 			Plan child;
@@ -115,25 +122,16 @@ public class Genetic {
 				Plan parent_2 = tournamentSelection(pop);
 				child = crossover(parent_1, parent_2,pop.project);
 				mutate(child);
-//				if(!(child.isValidPlan(pop.project))){
-//					//Population.invalid.add(child.toString());
-//					continue;
-//				}
-				//else if (child.isValidSequence(pop.project) && (pop.project.getMaxMmfsPerPeriod() > 1)){
-				//		child.convertSequence(pop.project);
-				//}
 			} while (!(child.isValidPlan(pop.project)) || Population.archive.contains(child.toString()));
 			child.evaluateFitness(pop.project);
 			children.savePlan(i, child);
-			//System.out.println(i);
 			Population.archive.add(child.toString());
+			allSolution.add(child);
 		}
-		//System.out.println("Exit Reproduce");
 		return children;
 	}
 	
 	public static Population selection(Population parent, Population children){
-		//System.out.println("Enter Selection");
 		Population newPopulation = new Population(POPULATION_SIZE, parent.project, false);
 		Population union = new Population(2 * POPULATION_SIZE, parent.project, false);
 		union.plans.addAll(parent.plans);
@@ -144,7 +142,6 @@ public class Genetic {
 		
 		for (int i = 0; i < fronts.size(); ++i){
 			last_front = i;
-			//System.out.println("Enter loop");
 			Front front = fronts.get(i);
 			front.crowdingDistance();
 			if (inserted + front.members.size() > POPULATION_SIZE)
@@ -157,7 +154,6 @@ public class Genetic {
 			}
 			
 		}
-		//System.out.println("Exit loop");
 		int remaining = POPULATION_SIZE - inserted;
 		if (remaining > 0){
 			Front f = fronts.get(last_front);
@@ -168,7 +164,6 @@ public class Genetic {
 				j++;
 			}
 		}
-		//System.out.println("Exit selection");
 		return newPopulation;
 	}
 	
@@ -179,7 +174,4 @@ public class Genetic {
 		else
 			return (candidate1.rank < candidate2.rank);
 	}
-
-
-
 }

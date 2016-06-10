@@ -1,22 +1,15 @@
 package cs.ucl.moifm.util;
 
-import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.jzy3d.analysis.AbstractAnalysis;
-import org.jzy3d.analysis.AnalysisLauncher;
-import org.jzy3d.chart.controllers.camera.AbstractCameraController;
 import org.jzy3d.chart.factories.AWTChartComponentFactory;
 import org.jzy3d.colors.Color;
-import org.jzy3d.colors.ColorMapper;
-import org.jzy3d.colors.colormaps.ColorMapRainbow;
 import org.jzy3d.maths.Coord3d;
 import org.jzy3d.maths.IntegerCoord2d;
-import org.jzy3d.plot3d.primitives.AWTScatterMultiColor;
 import org.jzy3d.plot3d.primitives.Scatter;
 import org.jzy3d.plot3d.rendering.canvas.Quality;
-import org.jzy3d.plot3d.rendering.legends.colorbars.AWTColorbarLegend;
 import org.jzy3d.plot3d.rendering.tooltips.CoordinateTooltipRenderer;
 import org.jzy3d.plot3d.rendering.tooltips.ITooltipRenderer;
 import org.jzy3d.plot3d.rendering.view.AWTView;

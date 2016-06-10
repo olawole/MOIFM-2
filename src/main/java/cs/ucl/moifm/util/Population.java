@@ -38,14 +38,6 @@ public class Population {
 				newPlan.evaluateFitness(project);
 				savePlan(counter++, newPlan);
 				Population.archive.add(newPlan.toString());
-//				if (newSequence.isValidSequence(proj)){
-//					newSequence.setFitnes(proj);
-//					saveSequence(counter++, newSequence);
-//					Population.archive.add(newSequence.toString());
-//				}
-//				else {
-//					Population.invalid.add(newSequence.toString());
-//				}
 			}
 		}
 	}
