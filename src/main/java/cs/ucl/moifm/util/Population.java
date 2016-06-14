@@ -77,7 +77,7 @@ public class Population {
 	}
 	
 	public List<Front> fastNonDominatedSort(){
-	//	System.out.println("Enter Fast");
+		System.out.println("Enter Fast");
 		List<Front> fronts = new ArrayList<Front>(5);
 		Front first = new Front(0);
 		
@@ -115,7 +115,7 @@ public class Population {
 			fronts.add(nextFront);
  
 		}
-	//	System.out.println("Exit Fast");
+		System.out.println("Exit Fast");
 		return fronts;
 
 	}

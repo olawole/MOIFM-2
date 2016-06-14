@@ -7,19 +7,34 @@ import java.util.List;
 import cs.ucl.moifm.model.DeliverySequence;
 import cs.ucl.moifm.model.Plan;
 
+/**
+ * 
+ * @author Olawole Oni
+ * This class implements dominated levels of Pareto set
+ *
+ */
 public class Front {
+	
 	
 	public List<Plan> members;
 	private static final String[] OBJECTIVES = {"ENPV", "ECOST","RISK"};
 	
 	int rank;
 	
+	/**
+	 * A constructor of the class Front
+	 * @param rank Rank of the pareto front
+	 */
 	public Front(int rank){
 		members = new ArrayList<Plan>();
 		this.rank = rank;
 	}
 	
+	/**
+	 * Method to compute the crowding distance of solutions in the same front
+	 */
 	public void crowdingDistance() {
+		System.out.println("Enter Crowding");
 		int l = members.size();
 		for (Plan d : members){
 			d.crowdingDistance = 0;
@@ -63,10 +78,14 @@ public class Front {
 			}
 			
 		}
-		
+		System.out.println("Exit Crowding");
 	}
 	
-
+	/**
+	 * Sort the members of the front using the Investment risk objective
+	 * @param lowerIndex index of the first element in the members list
+	 * @param higherIndex index of the last element in the members list
+	 */
 	public void sortRisk(int lowerIndex, int higherIndex) {
 		// TODO Auto-generated method stub
 		int i = lowerIndex;
@@ -88,7 +107,12 @@ public class Front {
 				sortRisk(i, higherIndex);
 		}
 	}
-
+	
+	/**
+	 * Sort the members of the front using the expected cost objective
+	 * @param lowerIndex index of the first element in the members list
+	 * @param higherIndex index of the last element in the members list
+	 */
 	public void sortCost(int lowerIndex, int higherIndex) {
 		// TODO Auto-generated method stub
 		int i = lowerIndex;
@@ -110,7 +134,12 @@ public class Front {
 				sortCost(i, higherIndex);
 		}
 	}
-
+	
+	/**
+	 * Sort the members of the front using the Net Present Value objective
+	 * @param lowerIndex index of the first element in the members list
+	 * @param higherIndex index of the last element in the members list
+	 */
 	public void sortNpv(int lowerIndex, int higherIndex) {
 		int i = lowerIndex;
 		int j = higherIndex;
@@ -141,13 +170,19 @@ public class Front {
 			return (d1.rank < d2.rank);
 	}
 	
+	/**
+	 * Sort the members of the front using the crowding distance
+	 * @param lowerIndex index of the first element in the members list
+	 * @param higherIndex index of the last element in the members list
+	 */
 	public void sortByCrowding(int lowerIndex, int higherIndex){
+		System.out.println("Enter Sort Crowding");
 		int i = lowerIndex;
 		int j = higherIndex;
-		int pivotIndex = i + (j-i)/2;
+		int pivotIndex = (i + j)/2;
 		Double pivot = members.get(pivotIndex).crowdingDistance;
 		while(i <= j){
-			while(j >= 0 && members.get(i).crowdingDistance > pivot) 
+			while(i >= 0 && members.get(i).crowdingDistance > pivot) 
 				i++;
 			while(j >= 0 && members.get(j).crowdingDistance < pivot) 
 				j--;
@@ -160,6 +195,7 @@ public class Front {
 			if (i < higherIndex)
 				sortByCrowding(i, higherIndex);
 		}
+		System.out.println("Exit Sort Crowding"); 
 		//Collections.reverse(members);
 	}
 

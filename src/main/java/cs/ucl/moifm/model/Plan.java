@@ -9,6 +9,15 @@ import java.util.Map;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
+/**
+ * 
+ * @author Olawole Oni
+ * 
+ * The class implements the assignment of features to various iterations or periods
+ * during planning of the delivery of a software system. It also stores the 
+ * corresponding objective values of the plan
+ *
+ */
 public class Plan {
 	// Representation of the plan for genetic manipulation
 	List<Integer> chromosome;
@@ -73,18 +82,25 @@ public class Plan {
 		this.expectedNPV = expectedPresentValue;
 	}
 	
+	/**
+	 * return the value of the investment risk
+	 * @return
+	 */
 	public double getInvestmentRisk() {
 		return investmentRisk;
 	}
-
-	public void setInvestmentRisk(double investmentRisk) {
-		this.investmentRisk = investmentRisk;
-	}
 	
+	/**
+	 * get the value of the return on investment
+	 * @return
+	 */
 	public double getExpectedROI() {
 		return expectedROI;
 	}
-
+	/**
+	 * set the value of the ROI
+	 * @param expectedROI
+	 */
 	public void setExpectedROI(double expectedROI) {
 		this.expectedROI = expectedROI;
 	}
@@ -105,7 +121,12 @@ public class Plan {
 		this.expectedCost = expectedCost;
 	}
 	
+	/**Compute the objective values for the three objectives
+	 * 
+	 * @param project reference to the current project
+	 */
 	public void evaluateFitness(Project project){
+//		System.out.println("Enter Fitness");
 		Double[] npv = new Double[project.nOfSim];
 		Double[] cost = new Double[project.nOfSim];
 		HashMap<Integer, String> plan = this.transformPlan();
@@ -165,8 +186,14 @@ public class Plan {
 				double npvSD = statsNpv.getStandardDeviation();
 				investmentRisk = Math.abs(expectedNPV / npvSD);
 				expectedROI = (expectedNPV / Math.abs(expectedCost)) * 100;
+//				System.out.println("Exit Fitness");
 	}
 	
+	/**
+	 * Randomly generate new plan based on the features in project
+	 * and precedence constraints
+	 * @param project
+	 */
 	public void generatePlan(Project project){	
 		int noOfFeatures = featureVector.size();
 		int startedFeatures = 0;
@@ -192,6 +219,10 @@ public class Plan {
 		
 	}
 	
+	/**
+	 * Converts the encoding of the plan to readable map assignment
+	 * @return
+	 */
 	public HashMap<Integer, String> transformPlan(){
 		HashMap<Integer, String> decodedPlan = new HashMap<Integer, String>();
 		for (int i = 0; i < chromosome.size(); i++){
@@ -208,7 +239,12 @@ public class Plan {
 		return decodedPlan;
 	}
 	
-	public boolean isValidPlan1(Project project){
+	/**
+	 * checks the validity of a plan
+	 * @param project
+	 * @return
+	 */
+	public boolean isValidPlan(Project project){
 		boolean isValid = true;
 		
 		//for each feature in featurevector
@@ -227,7 +263,7 @@ public class Plan {
 		return isValid;
 	}
 	
-	public boolean isValidPlan(Project project){
+	public boolean isValidPlan1(Project project){
 		boolean isValid = true;
 		
 		//for each feature in featurevector
@@ -257,7 +293,9 @@ public class Plan {
 		return isValid;
 	}
 	
-
+	/**
+	 * Converts the encoding of the plan to a string
+	 */
 	public String toString(){
 		String newString = "";
 		for (Integer s : chromosome){
@@ -266,6 +304,13 @@ public class Plan {
 		return newString;
 	}
 	
+	/**
+	 * discount a value based on the current period and interest rate
+	 * @param interestRate
+	 * @param period
+	 * @param value
+	 * @return
+	 */
 	public Double getDiscountedValue(double interestRate, int period, Double value){
     	if (period < 1) {
             throw new IllegalArgumentException("Invalid startPeriod: "
@@ -274,9 +319,41 @@ public class Plan {
     	return value / Math.pow(interestRate + 1, period);
     }
 	
-	public Double[][] cashFlowAnalysis(HashMap<Integer, String> plan){
-		Double [][] cFlow = new Double[featureVector.size()+2][];
-		
+	/**
+	 * generate a cash flow analysis table for the plan
+	 * @param plan
+	 * @return
+	 */
+	public Double[][] cashFlowAnalysis(HashMap<Integer, String> plan, Project project){
+		Double [][] cFlow = new Double[featureVector.size()+2][project.getPeriods()];
+		int row = 0;
+		for (Map.Entry<Integer, String> entry : plan.entrySet()){
+			if (entry.getKey() == 0){
+				String[] features = entry.getValue().split(",");
+				for (String feature : features){
+					int column = 0;
+					while (column < cFlow[row].length){
+						cFlow[row][column] = 0.0;
+						column++;
+					}
+					row++;
+				}
+			}
+			else {
+				String[] features = entry.getValue().split(",");
+				for (String feature : features){
+					int column = entry.getKey()-1;
+					Double[] cf = project.getSimAverage().get(feature);
+					int index = 0;
+					while (column < cFlow[row].length){
+						cFlow[row][column] = cf[index];
+						column++;
+						index++;
+					}
+					row++;
+				}
+			}
+		}
 		return cFlow;
 	}
 	

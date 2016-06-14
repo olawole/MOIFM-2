@@ -30,7 +30,7 @@ import java.util.Random;
  */
 public class Main {
 	
-	public static final int NO_GENERATION = 20 ;
+	public static final int NO_GENERATION = 5;
 	public static final int POP_SIZE = Genetic.POPULATION_SIZE;
 	public static final String HEADER = "Plan\tExpected NPV\tExpected Cost\tInvestment Risk";
 	public static final String TAB_SEPERATOR = "\t";
@@ -56,6 +56,8 @@ public class Main {
 			 for (int i = 0; i < NO_GENERATION; i++){
 				 System.out.println("Generation " + (i+1));
 				 long start = System.currentTimeMillis();
+				 if (i >= 12)
+					 System.out.println("Stop");
 				 pop = Genetic.evolvePopulation(pop);
 				 long runT = System.currentTimeMillis() - start;
 				 System.out.println("Time = " + runT/1000 + " Seconds");
@@ -68,6 +70,13 @@ public class Main {
 						 + "\tECOST = " + pareto.members.get(i).getExpectedCost() + "\tRisk = " + 
 						 pareto.members.get(i).getInvestmentRisk() + "\tEROI = " + pareto.members.get(i).getExpectedROI());
 			//	 pop.dSequence.get(i).setFitness(project);
+			 }
+			 Double [][] cfa = pareto.members.get(0).cashFlowAnalysis(pareto.members.get(0).transformPlan(), project);
+			 for (int i = 0; i < project.getFeatures().size(); i++){
+				 for (int j = 0; j < cfa[i].length;j++){
+					 System.out.print(cfa[i][j] + "\t");
+				 }
+				 System.out.println();
 			 }
 			 System.out.println("Solutions Explored = " + Population.archive.size());
 			 System.out.println("Mutation = " + Genetic.mutationNumber);
@@ -91,9 +100,9 @@ public class Main {
 			 precedenceReader.close(); 
 			 long runtime = System.currentTimeMillis() - startTime;
 			 System.out.println("Runtime = " + (runtime / 1000)/60 + " Minutes");
-			 Plot sd = new Plot(pareto, Genetic.allSolution);
-			 sd.setCanvasType("newt");
-			 AnalysisLauncher.open(sd);
+//			 Plot sd = new Plot(pareto, Genetic.allSolution);
+//			 sd.setCanvasType("newt");
+//			 AnalysisLauncher.open(sd);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

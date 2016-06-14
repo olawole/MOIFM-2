@@ -29,6 +29,7 @@ public class Project implements PropertyChangeListener {
     private HashMap<String, Double[]> sanpv;
     private HashMap<String, Double[][]> simCashflow;
     private HashMap<String, Double[][]> simSanpv;
+    private HashMap<String, Double[]> simAverage;
    // private List<MMF> mmfs;
     private String nextId;
     private int maxMmfsPerPeriod;
@@ -371,6 +372,14 @@ public class Project implements PropertyChangeListener {
 		for (String s : mmfs.keySet()){
 			features.add(s);
 		}
+	}
+
+	public HashMap<String, Double[]> getSimAverage() {
+		return simAverage;
+	}
+
+	public void setSimAverage(HashMap<String, Double[]> simAverage) {
+		this.simAverage = simAverage;
 	}
 	
 

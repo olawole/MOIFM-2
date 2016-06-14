@@ -10,8 +10,8 @@ import cs.ucl.moifm.model.Project;
 public class Genetic {
 	
 	//parameters
-	private static final double MUTATION_RATE = 1.0 / 9.0;
-	public static final String[] MUTATION_OPERATOR = new String[]{"flipzero","swap","flipnonzero"};
+	public static final double MUTATION_RATE = 1.0 / 9.0;
+	public static final String[] MUTATION_OPERATOR = new String[]{"swap","flipnonzero"};
 	public static int mutationNumber = 0;
 	public static int crossOverNumber = 0;
 	public static final int POPULATION_SIZE = 100;
@@ -30,12 +30,12 @@ public class Genetic {
 		if (Math.random() < MUTATION_RATE){
 		int opIndex = (int)(Math.random() * MUTATION_OPERATOR.length);
 		switch (MUTATION_OPERATOR[opIndex]){
-		case "flipzero":
-			mutationNumber += 1;
-			int mutPoint = (int) (child.getChromosome().size() * Math.random());
-			child.getChromosome().remove(mutPoint);
-			child.getChromosome().add(mutPoint, 0);
-			break;
+//		case "flipzero":
+//			mutationNumber += 1;
+//			int mutPoint = (int) (child.getChromosome().size() * Math.random());
+//			child.getChromosome().remove(mutPoint);
+//			child.getChromosome().add(mutPoint, 0);
+//			break;
 		case "swap":
 			mutationNumber += 1;
 			int pos1 = (int) (child.getChromosome().size() * Math.random());
@@ -114,6 +114,7 @@ public class Genetic {
 	}
 	
 	public static Population reproduce(Population pop){
+//		System.out.println("Enter Reproduce");
 		Population children = new Population(POPULATION_SIZE, pop.project, false);
 		for (int i = 0; i < POPULATION_SIZE; i++){
 			Plan child;
@@ -122,6 +123,7 @@ public class Genetic {
 				Plan parent_2 = tournamentSelection(pop);
 				child = crossover(parent_1, parent_2,pop.project);
 				mutate(child);
+//				System.out.println(child.toString() + " = " + child.isValidPlan(pop.project));
 			} while (!(child.isValidPlan(pop.project)) || Population.archive.contains(child.toString()));
 			if(child.getChromosome().contains(0))
 				repairChromosome(child, pop.project);
@@ -130,10 +132,12 @@ public class Genetic {
 			Population.archive.add(child.toString());
 			allSolution.add(child);
 		}
+//		System.out.println("Exit Reproduce");
 		return children;
 	}
 	
 	public static Population selection(Population parent, Population children){
+		System.out.println("Enter selection");
 		Population newPopulation = new Population(POPULATION_SIZE, parent.project, false);
 		Population union = new Population(2 * POPULATION_SIZE, parent.project, false);
 		union.plans.addAll(parent.plans);
@@ -145,9 +149,11 @@ public class Genetic {
 		for (int i = 0; i < fronts.size(); ++i){
 			last_front = i;
 			Front front = fronts.get(i);
-			front.crowdingDistance();
-			if (inserted + front.members.size() > POPULATION_SIZE)
+			
+			if (inserted + front.members.size() > POPULATION_SIZE){
+				front.crowdingDistance();
 				break;
+			}
 			int j = 0;
 			while (j < front.members.size()){
 				newPopulation.savePlan(inserted, front.members.get(j));
@@ -166,6 +172,7 @@ public class Genetic {
 				j++;
 			}
 		}
+		System.out.println("Exit selection");
 		return newPopulation;
 	}
 	

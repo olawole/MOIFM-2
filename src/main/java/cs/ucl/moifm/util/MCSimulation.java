@@ -26,6 +26,8 @@ public class MCSimulation {
 	
 	private Double[][] sim;
 	
+	private Double[] avgSim;
+	
 	public MCSimulation(int period){
 		
 		this.period = period;
@@ -33,11 +35,14 @@ public class MCSimulation {
 	
 	public void simulate(Project project){
 		HashMap<String, Double[][]> scenario = new HashMap<String, Double[][]>();
+		HashMap<String, Double[]> average = new HashMap<String, Double[]>();
 		for(Entry<String, MMF> mmf : project.getMmfs().entrySet()){
 			List<CashDistribution> c = mmf.getValue().getCashvalue();
 			if(period != c.size()) return;
 			sim = new Double[N][period];
+			avgSim = new Double[period];
 			for (int i = 0; i < c.size(); i++){
+				Double sum = 0.0;
 				TriangularDistribution distribution = 
 						new TriangularDistribution(Math.abs(c.get(i).getLeast()), Math.abs(c.get(i).getMode()), Math.abs(c.get(i).getMost()));
 				for (int j = 0; j < N; j++){
@@ -48,14 +53,18 @@ public class MCSimulation {
 					else {
 						sim[j][i] = distribution.sample();
 					}
+					sum += sim[j][i];
 				}
+				avgSim[i] = sum / N;
+				
 			}
 			
 			scenario.put(mmf.getValue().getId(), sim);
-			
+			average.put(mmf.getValue().getId(), avgSim);
 		}
 		
 		project.setSimCashflow(scenario);
+		project.setSimAverage(average);
 		project.nOfSim = N;
 		
 	}
