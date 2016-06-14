@@ -30,7 +30,7 @@ import java.util.Random;
  */
 public class Main {
 	
-	public static final int NO_GENERATION = 20;
+	public static final int NO_GENERATION = 5;
 	public static final int POP_SIZE = Genetic.POPULATION_SIZE;
 	public static final String HEADER = "Plan\tExpected NPV\tExpected Cost\tInvestment Risk";
 	public static final String TAB_SEPERATOR = "\t";
@@ -72,7 +72,7 @@ public class Main {
 			//	 pop.dSequence.get(i).setFitness(project);
 			 }
 			 Double [][] cfa = pareto.members.get(0).cashFlowAnalysis(pareto.members.get(0).transformPlan(), project);
-			 for (int i = 0; i < project.getFeatures().size(); i++){
+			 for (int i = 0; i <= project.getFeatures().size(); i++){
 				 for (int j = 0; j < cfa[i].length;j++){
 					 System.out.print(cfa[i][j] + "\t");
 				 }

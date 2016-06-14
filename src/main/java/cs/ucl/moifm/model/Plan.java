@@ -354,6 +354,15 @@ public class Plan {
 				}
 			}
 		}
+		for (int i = 0; i < project.getPeriods(); i++){
+			Double sum = 0.0;
+			for (int j = 0; j < featureVector.size();j++){
+				if (cFlow[j][i] != null)
+					sum += cFlow[j][i];
+			}
+			cFlow[featureVector.size()][i] = sum;
+		}
+		
 		return cFlow;
 	}
 	
