@@ -30,7 +30,7 @@ import java.util.Random;
  */
 public class Main {
 	
-	public static final int NO_GENERATION = 5;
+	public static final int NO_GENERATION = 20;
 	public static final int POP_SIZE = Genetic.POPULATION_SIZE;
 	public static final String HEADER = "Plan\tExpected NPV\tExpected Cost\tInvestment Risk";
 	public static final String TAB_SEPERATOR = "\t";
