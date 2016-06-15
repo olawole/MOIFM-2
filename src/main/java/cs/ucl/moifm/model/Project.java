@@ -1,10 +1,6 @@
 package cs.ucl.moifm.model;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -14,12 +10,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 
-public class Project implements PropertyChangeListener {
-	public static final String EVENT_NAME = "project.name";
-    public static final String EVENT_PERIODS = "project.periods";
-    public static final String EVENT_INTEREST_RATE = "project.interestRate";
-    public static final String EVENT_MMFS = "project.mmfs";
-    public static final String EVENT_MAX_MMFS = "project.maxMMFs";
+public class Project{
+	
 
     private String name;
     private int periods;
@@ -30,14 +22,12 @@ public class Project implements PropertyChangeListener {
     private HashMap<String, Double[][]> simCashflow;
     private HashMap<String, Double[][]> simSanpv;
     private HashMap<String, Double[]> simAverage;
-   // private List<MMF> mmfs;
     private String nextId;
     private int maxMmfsPerPeriod;
     private List<String> strands;
     public int nOfSim;
     
     private double budgetConstraint;
-    private PropertyChangeSupport changeSupport;
     
     /**
      * Creates a new IFM Project with default values for all properties.
@@ -51,7 +41,6 @@ public class Project implements PropertyChangeListener {
         this.maxMmfsPerPeriod = 1;
         this.budgetConstraint = 0.0;
         this.sanpv = new HashMap<String, Double[]>();
-        this.changeSupport = new PropertyChangeSupport(this);
         this.nOfSim = 10000;
         this.strands = new ArrayList<String>();
         this.features = new ArrayList<String>();
@@ -65,9 +54,7 @@ public class Project implements PropertyChangeListener {
      * Sets the project name and fires the event EVENT_NAME.
      */
     public void setName(String name) {
-        String oldValue = this.name;
         this.name = name;
-        changeSupport.firePropertyChange(EVENT_NAME, oldValue, name);
     }
 
     public int getPeriods() {
@@ -86,9 +73,7 @@ public class Project implements PropertyChangeListener {
         if ((periods < 1) || (periods > 105)) {
             throw new MMFException("Invalid number of periods: " + periods);
         }
-        int oldValue = this.periods;
         this.periods = periods;
-        changeSupport.firePropertyChange(EVENT_PERIODS, oldValue, periods);
     }
 
     public double getInterestRate() {
@@ -101,10 +86,7 @@ public class Project implements PropertyChangeListener {
      * 12% = 0.12)
      */
     public void setInterestRate(double interestRate) {
-        double oldValue = this.interestRate;
         this.interestRate = interestRate;
-        changeSupport.firePropertyChange(EVENT_INTEREST_RATE, oldValue,
-                interestRate);
     }
     
     /**
@@ -124,10 +106,7 @@ public class Project implements PropertyChangeListener {
             throw new MMFException("Invalid maxMMFsPerPeriod: "
                     + maxMmfsPerPeriod);
         }
-        int oldValue = this.maxMmfsPerPeriod;
         this.maxMmfsPerPeriod = maxMmfsPerPeriod;
-        changeSupport.firePropertyChange(EVENT_MAX_MMFS, oldValue,
-                maxMmfsPerPeriod);
     }
     
     /**
@@ -152,9 +131,7 @@ public class Project implements PropertyChangeListener {
             }
         }
         mmf.setProject(this);
-        mmf.addPropertyChangeListener(this);
         mmfs.put(mmf.getId(), mmf);
-        changeSupport.firePropertyChange(EVENT_MMFS, null, mmf);
     }
     
     public void setNextId(String nextId) {
@@ -219,7 +196,6 @@ public class Project implements PropertyChangeListener {
      * Removes the mmf from the list of mmfs and fires the EVENT_MMFS event.
      */
     public void remove(MMF mmf) {
-        mmf.removePropertyChangeListener(this);
         for (Entry<String, MMF> m : mmfs.entrySet()) {
             if (m.getValue().getPrecursors().contains(mmf)) {
                 m.getValue().removePrecursor(mmf);
@@ -227,7 +203,6 @@ public class Project implements PropertyChangeListener {
         }
         mmf.setProject(null);
         mmfs.remove(mmf);
-        changeSupport.firePropertyChange(EVENT_MMFS, mmf, null);
     }
 
     /**
@@ -237,30 +212,6 @@ public class Project implements PropertyChangeListener {
         return mmfs.size();
     }
     
-    /**
-     * Is called whenever there is a change in a child MMF or Category. Project
-     * does not directly use this, but forwards all events to the
-     * PropertyChangeListeners of this project.
-     */
-    public void propertyChange(PropertyChangeEvent evt) {
-        changeSupport.firePropertyChange(evt);
-    }
-
-    /**
-     * Add a PropertyChangeListener to be notified of changes to this object or
-     * child objects (MMFs and Categories)
-     */
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.addPropertyChangeListener(listener);
-    }
-
-    /**
-     * Remove a PropertyChangeListener
-     */
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.removePropertyChangeListener(listener);
-    }
-
 	public double getBudgetConstraint() {
 		return budgetConstraint;
 	}

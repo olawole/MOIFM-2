@@ -33,7 +33,7 @@ import java.util.stream.IntStream;
  */
 public class Main {
 	
-	public static final int NO_GENERATION = 5;
+	public static final int NO_GENERATION = 20;
 	public static final int POP_SIZE = Genetic.POPULATION_SIZE;
 	public static final String HEADER = "Plan\tExpected NPV\tExpected Cost\tInvestment Risk";
 	public static final String TAB_SEPERATOR = "\t";
@@ -47,54 +47,52 @@ public class Main {
 		// TODO Auto-generated method stub
 		try {
 			long startTime = System.currentTimeMillis();
-			CSVReader reader = new CSVReader(new FileReader("input2.csv"));
-			CSVReader precedenceReader = new CSVReader(new FileReader("precedence2.csv"));
-			 Project project = new Project();
-			 ModelParser.fileToModelParser(reader, project);
-			 ModelParser.convertFileToPrecedence(precedenceReader, project);
-			 MCSimulation simu = new MCSimulation(project.getPeriods());
-			 simu.simulate(project);
-			 simu.simulate_sanpv(project.getSimCashflow(), project);
-			 Population pop = new Population(POP_SIZE, project, true);			 
-			 for (int i = 0; i < NO_GENERATION; i++){
+			CSVReader reader = new CSVReader(new FileReader("input3.csv"));
+			CSVReader precedenceReader = new CSVReader(new FileReader("precedence3.csv"));
+			Project project = new Project();
+			ModelParser.fileToModelParser(reader, project);
+			ModelParser.convertFileToPrecedence(precedenceReader, project);
+			MCSimulation simu = new MCSimulation(project.getPeriods());
+			simu.simulate(project);
+			simu.simulate_sanpv(project.getSimCashflow(), project);
+			Population pop = new Population(POP_SIZE, project, true);			 
+			for (int i = 0; i < NO_GENERATION; i++){
 				 System.out.println("Generation " + (i+1));
 				 long start = System.currentTimeMillis();
-				 if (i >= 12)
-					 System.out.println("Stop");
 				 pop = Genetic.evolvePopulation(pop);
 				 long runT = System.currentTimeMillis() - start;
 				 System.out.println("Time = " + runT/1000 + " Seconds");
-			 }
-			 System.out.println("\n----------------------------------------------------------------------");
-			 Front pareto = pop.fastNonDominatedSort().get(0);
-			 pareto.sortNpv(0, pareto.members.size() - 1);
-			 for (int i = 0; i < pareto.members.size(); i++){
+			}
+			System.out.println("\n----------------------------------------------------------------------");
+			Front pareto = pop.fastNonDominatedSort().get(0);
+			pareto.sortNpv(0, pareto.members.size() - 1);
+			for (int i = 0; i < pareto.members.size(); i++){
 				 System.out.println(pareto.members.get(i).transformPlan().toString() + "\tENPV = " + pareto.members.get(i).getExpectedNPV()
 						 + "\tECOST = " + pareto.members.get(i).getExpectedCost() + "\tRisk = " + 
 						 pareto.members.get(i).getInvestmentRisk() + "\tEROI = " + pareto.members.get(i).getExpectedROI());
 			//	 pop.dSequence.get(i).setFitness(project);
-			 }
-//			 Double [][] cfa = pareto.members.get(2).cashFlowAnalysis(pareto.members.get(0).transformPlan(), project);
-//			 int[] xdata = IntStream.rangeClosed(1, project.getPeriods()).toArray();
-//			 Double[] ydata = cfa[project.getFeatures().size()+1];
-//			 final Curve curve = new Curve("Cash Flow Analysis", xdata, ydata);
-//		     curve.pack();
-//		     RefineryUtilities.centerFrameOnScreen(curve);
-//		     curve.setVisible(true);
-//			 for (int i = 0; i <= project.getFeatures().size()+1; i++){
-//				 for (int j = 0; j < cfa[i].length;j++){
-//					 System.out.print(cfa[i][j] + "\t");
-//				 }
-//				 System.out.println();
-//			 }
-			 System.out.println("Solutions Explored = " + Population.archive.size());
-			 System.out.println("Mutation = " + Genetic.mutationNumber);
-			 System.out.println("Crossover = " + Genetic.crossOverNumber);
-			 System.out.println(Genetic.allSolution.size());
-			 FileWriter output = new FileWriter("output.tsv");
-			 output.append(HEADER.toString());
-			 output.append(LINE_SEPERATOR);
-			 for (int i = 0; i < pareto.members.size(); i++){
+			}
+			Double [][] cfa = pareto.members.get(2).cashFlowAnalysis(pareto.members.get(0).transformPlan(), project);
+			int[] xdata = IntStream.rangeClosed(1, project.getPeriods()).toArray();
+			Double[] ydata = cfa[project.getFeatures().size()+1];
+			final Curve curve = new Curve("Cash Flow Analysis", xdata, ydata);
+		    curve.pack();
+		    RefineryUtilities.centerFrameOnScreen(curve);
+		    curve.setVisible(true);
+			for (int i = 0; i <= project.getFeatures().size()+1; i++){
+				 for (int j = 0; j < cfa[i].length;j++){
+					 System.out.print(cfa[i][j] + "\t");
+				 }
+				 System.out.println();
+			}
+			System.out.println("Solutions Explored = " + Population.archive.size());
+			System.out.println("Mutation = " + Genetic.mutationNumber);
+			System.out.println("Crossover = " + Genetic.crossOverNumber);
+			System.out.println(Genetic.allSolution.size());
+			FileWriter output = new FileWriter("output.tsv");
+			output.append(HEADER.toString());
+			output.append(LINE_SEPERATOR);
+			for (int i = 0; i < pareto.members.size(); i++){
 				 output.append(pareto.members.get(i).transformPlan().toString());
 				 output.append(TAB_SEPERATOR);
 				 output.append(String.valueOf(pareto.members.get(i).getExpectedNPV()));
@@ -103,15 +101,15 @@ public class Main {
 				 output.append(TAB_SEPERATOR);
 				 output.append(String.valueOf(pareto.members.get(i).getInvestmentRisk()));
 				 output.append(LINE_SEPERATOR);
-			 }
-			 output.close();
-			 reader.close();
-			 precedenceReader.close(); 
-			 long runtime = System.currentTimeMillis() - startTime;
-			 System.out.println("Runtime = " + (runtime / 1000)/60 + " Minutes");
-//			 Plot sd = new Plot(pareto, Genetic.allSolution);
-//			 sd.setCanvasType("newt");
-//			 AnalysisLauncher.open(sd);
+			}
+			output.close();
+			reader.close();
+			precedenceReader.close(); 
+			long runtime = System.currentTimeMillis() - startTime;
+			System.out.println("Runtime = " + (runtime / 1000)/60 + " Minutes");
+//			Plot sd = new Plot(pareto, Genetic.allSolution);
+//			sd.setCanvasType("newt");
+//			AnalysisLauncher.open(sd);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
