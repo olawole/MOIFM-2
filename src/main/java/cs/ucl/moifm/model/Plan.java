@@ -1,5 +1,6 @@
 package cs.ucl.moifm.model;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -327,6 +328,7 @@ public class Plan {
 	public Double[][] cashFlowAnalysis(HashMap<Integer, String> plan, Project project){
 		Double [][] cFlow = new Double[featureVector.size()+2][project.getPeriods()];
 		int row = 0;
+		DecimalFormat df = new DecimalFormat("#.##");
 		for (Map.Entry<Integer, String> entry : plan.entrySet()){
 			if (entry.getKey() == 0){
 				String[] features = entry.getValue().split(",");
@@ -346,7 +348,8 @@ public class Plan {
 					Double[] cf = project.getSimAverage().get(feature);
 					int index = 0;
 					while (column < cFlow[row].length){
-						cFlow[row][column] = cf[index];
+						Double discValue = getDiscountedValue(project.getInterestRate(), column+1, cf[index]);
+						cFlow[row][column] = Double.valueOf(df.format(discValue));
 						column++;
 						index++;
 					}
@@ -357,11 +360,22 @@ public class Plan {
 		for (int i = 0; i < project.getPeriods(); i++){
 			Double sum = 0.0;
 			for (int j = 0; j < featureVector.size();j++){
-				if (cFlow[j][i] != null)
+				if (cFlow[j][i] != null){
 					sum += cFlow[j][i];
+				}
+				else {
+					cFlow[j][i] = 0.0;
+				}
 			}
-			cFlow[featureVector.size()][i] = sum;
+			cFlow[featureVector.size()][i] = Double.valueOf(df.format(sum));
 		}
+		
+		Double rollingNpv = 0.0;
+		for (int i = 0; i < project.getPeriods(); i++){
+			rollingNpv += cFlow[featureVector.size()][i];
+			cFlow[featureVector.size()+1][i] = Double.valueOf(df.format(rollingNpv));
+		}
+		
 		
 		return cFlow;
 	}

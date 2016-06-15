@@ -9,6 +9,7 @@ import cs.ucl.moifm.model.DeliverySequence;
 import cs.ucl.moifm.model.MMFException;
 import cs.ucl.moifm.model.Plan;
 import cs.ucl.moifm.model.Project;
+import cs.ucl.moifm.util.Curve;
 import cs.ucl.moifm.util.Front;
 import cs.ucl.moifm.util.Genetic;
 import cs.ucl.moifm.util.MCSimulation;
@@ -16,6 +17,7 @@ import cs.ucl.moifm.util.ModelParser;
 import cs.ucl.moifm.util.Plot;
 import cs.ucl.moifm.util.Population;
 
+import org.jfree.ui.RefineryUtilities;
 import org.jzy3d.analysis.AnalysisLauncher;
 
 import java.io.*;
@@ -24,6 +26,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.IntStream;
 /**
  * @author Olawole
  *
@@ -71,13 +74,19 @@ public class Main {
 						 pareto.members.get(i).getInvestmentRisk() + "\tEROI = " + pareto.members.get(i).getExpectedROI());
 			//	 pop.dSequence.get(i).setFitness(project);
 			 }
-			 Double [][] cfa = pareto.members.get(0).cashFlowAnalysis(pareto.members.get(0).transformPlan(), project);
-			 for (int i = 0; i <= project.getFeatures().size(); i++){
-				 for (int j = 0; j < cfa[i].length;j++){
-					 System.out.print(cfa[i][j] + "\t");
-				 }
-				 System.out.println();
-			 }
+//			 Double [][] cfa = pareto.members.get(2).cashFlowAnalysis(pareto.members.get(0).transformPlan(), project);
+//			 int[] xdata = IntStream.rangeClosed(1, project.getPeriods()).toArray();
+//			 Double[] ydata = cfa[project.getFeatures().size()+1];
+//			 final Curve curve = new Curve("Cash Flow Analysis", xdata, ydata);
+//		     curve.pack();
+//		     RefineryUtilities.centerFrameOnScreen(curve);
+//		     curve.setVisible(true);
+//			 for (int i = 0; i <= project.getFeatures().size()+1; i++){
+//				 for (int j = 0; j < cfa[i].length;j++){
+//					 System.out.print(cfa[i][j] + "\t");
+//				 }
+//				 System.out.println();
+//			 }
 			 System.out.println("Solutions Explored = " + Population.archive.size());
 			 System.out.println("Mutation = " + Genetic.mutationNumber);
 			 System.out.println("Crossover = " + Genetic.crossOverNumber);

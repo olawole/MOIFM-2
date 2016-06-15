@@ -3,8 +3,15 @@
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
-	<classpathentry kind="lib" path="C:/Users/Olawole/Desktop/commons-math3-3.6/commons-math3-3.6.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Olawole/Desktop/commons-math3-3.6/commons-math3-3.6-javadoc.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Olawole/Desktop/commons-math3-3.6/opencsv-3.7.jar"/>
+	<classpathentry kind="lib" path="N:/Git/MOIFM-2/lib/commons-math3-3.6.jar"/>
+	<classpathentry kind="lib" path="N:/Git/MOIFM-2/lib/commons-math3-3.6-javadoc.jar"/>
+	<classpathentry kind="lib" path="N:/Git/MOIFM-2/lib/gluegen-rt.jar"/>
+	<classpathentry kind="lib" path="N:/Git/MOIFM-2/lib/jogl-all.jar"/>
+	<classpathentry kind="lib" path="N:/Git/MOIFM-2/lib/jzy3d-api-1.0.0-20160507.130542-19.jar"/>
+	<classpathentry kind="lib" path="N:/Git/MOIFM-2/lib/log4j-1.2.17.jar"/>
+	<classpathentry kind="lib" path="N:/Git/MOIFM-2/lib/opencsv-3.7.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="N:/Git/MOIFM-2/lib/jfreechart-1.0.19/lib/jfreechart-1.0.19.jar"/>
+	<classpathentry kind="lib" path="N:/Git/MOIFM-2/lib/jfreechart-1.0.19/lib/jcommon-1.0.23.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
