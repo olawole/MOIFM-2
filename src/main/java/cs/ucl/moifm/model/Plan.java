@@ -2,7 +2,6 @@ package cs.ucl.moifm.model;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -332,7 +331,7 @@ public class Plan {
 		for (Map.Entry<Integer, String> entry : plan.entrySet()){
 			if (entry.getKey() == 0){
 				String[] features = entry.getValue().split(",");
-				for (String feature : features){
+				for (@SuppressWarnings("unused") String feature : features){
 					int column = 0;
 					while (column < cFlow[row].length){
 						cFlow[row][column] = 0.0;

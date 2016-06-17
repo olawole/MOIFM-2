@@ -5,7 +5,6 @@ package cs.ucl.moifm.util;
 
 import java.util.List;
 
-import cs.ucl.moifm.model.DeliverySequence;
 import cs.ucl.moifm.model.Plan;
 
 /**

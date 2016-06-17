@@ -66,7 +66,6 @@ public class MainFrame extends JFrame {
     private static final long serialVersionUID = 1L;
 
     Project project;
-    private boolean changed;
 
 
     /** Creates new form MainFrame */
@@ -123,7 +122,7 @@ public class MainFrame extends JFrame {
         roiWaterfallPanel = new javax.swing.JPanel();
         roiWaterfallTableScrollPane = new javax.swing.JScrollPane();
         roiWaterfallTable = new javax.swing.JTable();
-        categoryComboBox = new javax.swing.JComboBox();
+//        categoryComboBox = new javax.swing.JComboBox();
         categoryTablePopupMenu = new javax.swing.JPopupMenu();
         categoryDeleteMenuItem = new javax.swing.JMenuItem();
         mmfTablePopupMenu = new javax.swing.JPopupMenu();

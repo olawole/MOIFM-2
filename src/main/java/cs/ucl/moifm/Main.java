@@ -5,9 +5,7 @@ package cs.ucl.moifm;
 
 import com.opencsv.*;
 
-import cs.ucl.moifm.model.DeliverySequence;
-import cs.ucl.moifm.model.MMFException;
-import cs.ucl.moifm.model.Plan;
+import cs.ucl.moifm.model.MMF;
 import cs.ucl.moifm.model.Project;
 import cs.ucl.moifm.util.Curve;
 import cs.ucl.moifm.util.Front;
@@ -16,24 +14,24 @@ import cs.ucl.moifm.util.MCSimulation;
 import cs.ucl.moifm.util.ModelParser;
 import cs.ucl.moifm.util.Plot;
 import cs.ucl.moifm.util.Population;
+import cs.ucl.moifm.util.PrecedenceGraph;
 
 import org.jfree.ui.RefineryUtilities;
 import org.jzy3d.analysis.AnalysisLauncher;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.IntStream;
+
+import javax.swing.JFrame;
 /**
  * @author Olawole
  *
  */
 public class Main {
 	
-	public static final int NO_GENERATION = 20;
+	public static final int NO_GENERATION = 30;
 	public static final int POP_SIZE = Genetic.POPULATION_SIZE;
 	public static final String HEADER = "Plan\tExpected NPV\tExpected Cost\tInvestment Risk";
 	public static final String TAB_SEPERATOR = "\t";
@@ -52,6 +50,19 @@ public class Main {
 			Project project = new Project();
 			ModelParser.fileToModelParser(reader, project);
 			ModelParser.convertFileToPrecedence(precedenceReader, project);
+			List<MMF> m = new ArrayList<MMF>();
+			for (String id : project.getMmfs().keySet()){
+				m.add(project.getMmfs().get(id));
+			}
+			PrecedenceGraph applet = new PrecedenceGraph(m);
+	        applet.init();
+	        JFrame frame = new JFrame();
+	        frame.getContentPane().add(applet);
+	        frame.setTitle("Precedence graph for the project");
+	        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	        frame.pack();
+	        frame.setVisible(true);
+	        
 			MCSimulation simu = new MCSimulation(project.getPeriods());
 			simu.simulate(project);
 			simu.simulate_sanpv(project.getSimCashflow(), project);
@@ -107,9 +118,9 @@ public class Main {
 			precedenceReader.close(); 
 			long runtime = System.currentTimeMillis() - startTime;
 			System.out.println("Runtime = " + (runtime / 1000)/60 + " Minutes");
-//			Plot sd = new Plot(pareto, Genetic.allSolution);
-//			sd.setCanvasType("newt");
-//			AnalysisLauncher.open(sd);
+			Plot sd = new Plot(pareto, Genetic.allSolution);
+			sd.setCanvasType("newt");
+			AnalysisLauncher.open(sd);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -7,8 +7,6 @@
 
 package cs.ucl.moifm.model;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
@@ -75,9 +73,6 @@ public class MMF {
      */
     private Project project;
     
-    private PropertyChangeSupport changeSupport;
-    
-    
     /**
      * Creates a new MMF with the given id and name.
      * 
@@ -91,7 +86,6 @@ public class MMF {
         this.precursors = new ArrayList<MMF>();
         this.cashflow = new ArrayList<Double>();
         this.cashvalue = new ArrayList<CashDistribution>();
-        this.changeSupport = new PropertyChangeSupport(this);
     }
     
     /**
@@ -119,9 +113,7 @@ public class MMF {
             throw new MMFException("The id is not valid or has a duplicate: "
                     + id);
         }
-        String oldValue = this.id;
         this.id = id;
-        changeSupport.firePropertyChange(EVENT_ID, oldValue, id);
     }
     
     /**
@@ -130,9 +122,7 @@ public class MMF {
      * @param name
      */
     public void setName(String name) {
-        String oldValue = this.name;
         this.name = name;
-        changeSupport.firePropertyChange(EVENT_NAME, oldValue, name);
     }
     
     public String getName() {
@@ -166,9 +156,7 @@ public class MMF {
     		for (Double cash : this.cashflow){
     			if (cash < 0) ++period;
     		}
-    		int oldValue = this.devPeriod;
             this.devPeriod = period;
-            changeSupport.firePropertyChange(EVENT_NUMBER_OF_DEVELOPMENT_PERIOD, oldValue, period);
     	}
     }
     
@@ -214,7 +202,6 @@ public class MMF {
 
         // replace existing list
         this.precursors = newPrecursors;
-        changeSupport.firePropertyChange(EVENT_PRECURSORS, null, null);
     }
     
     /**
@@ -228,7 +215,6 @@ public class MMF {
         if (this.precursors.indexOf(precursor) < 0) {
             checkValidPrecursor(precursor);
             this.precursors.add(precursor);
-            changeSupport.firePropertyChange(EVENT_PRECURSORS, null, precursor);
         }
     } 
     
@@ -273,7 +259,6 @@ public class MMF {
     public void removePrecursor(MMF precursor) {
         if (this.precursors.indexOf(precursor) >= 0) {
             this.precursors.remove(precursor);
-            changeSupport.firePropertyChange(EVENT_PRECURSORS, precursor, null);
         }
     }
     
@@ -332,9 +317,7 @@ public class MMF {
         while (period > cashflow.size()) {
             cashflow.add((double) 0);
         }
-        Double oldValue = this.getRevenue(period);
         this.cashflow.set(period - 1, (double) revenue);
-        changeSupport.firePropertyChange(EVENT_CASHFLOW, oldValue, revenue);
     }
     
     public Double getRevenue(int period) {
@@ -348,20 +331,6 @@ public class MMF {
         return cashflow.size();
     }
     
-    /**
-     * Add a PropertyChangeListener to be notified of changes to this object
-     */
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.addPropertyChangeListener(listener);
-    }
-
-    /**
-     * Remove a PropertyChangeListener
-     */
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.removePropertyChangeListener(listener);
-    }
-    
     public Project getProject() {
         return project;
     }
@@ -372,9 +341,7 @@ public class MMF {
      * @param project
      */
     public void setProject(Project project) {
-        Project oldValue = this.project;
         this.project = project;
-        changeSupport.firePropertyChange(EVENT_PROJECT, oldValue, project);
     }
     
     /**

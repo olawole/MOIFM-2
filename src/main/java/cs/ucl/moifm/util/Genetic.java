@@ -11,7 +11,7 @@ public class Genetic {
 	
 	//parameters
 	public static final double MUTATION_RATE = 1.0 / 9.0;
-	public static final String[] MUTATION_OPERATOR = new String[]{"swap","flipnonzero"};
+	public static final String[] MUTATION_OPERATOR = new String[]{"flipzero","swap","flipnonzero"};
 	public static int mutationNumber = 0;
 	public static int crossOverNumber = 0;
 	public static final int POPULATION_SIZE = 100;
@@ -30,12 +30,12 @@ public class Genetic {
 		if (Math.random() < MUTATION_RATE){
 		int opIndex = (int)(Math.random() * MUTATION_OPERATOR.length);
 		switch (MUTATION_OPERATOR[opIndex]){
-//		case "flipzero":
-//			mutationNumber += 1;
-//			int mutPoint = (int) (child.getChromosome().size() * Math.random());
-//			child.getChromosome().remove(mutPoint);
-//			child.getChromosome().add(mutPoint, 0);
-//			break;
+		case "flipzero":
+			mutationNumber += 1;
+			int mutPoint = (int) (child.getChromosome().size() * Math.random());
+			child.getChromosome().remove(mutPoint);
+			child.getChromosome().add(mutPoint, 0);
+			break;
 		case "swap":
 			mutationNumber += 1;
 			int pos1 = (int) (child.getChromosome().size() * Math.random());
