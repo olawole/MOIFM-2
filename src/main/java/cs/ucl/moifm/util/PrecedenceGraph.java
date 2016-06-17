@@ -67,7 +67,7 @@ public class PrecedenceGraph
 {
     private static final long serialVersionUID = 3256444702936019250L;
     private static final Color DEFAULT_BG_COLOR = Color.decode("#FAFBFF");
-    private static final Dimension DEFAULT_SIZE = new Dimension(530, 320);
+    private static final Dimension DEFAULT_SIZE = new Dimension(700, 400);
     private List<MMF> features;
 
     //
@@ -110,7 +110,7 @@ public class PrecedenceGraph
         jgAdapter = new JGraphModelAdapter<String, DefaultEdge>(g);
 
         JGraph jgraph = new JGraph(jgAdapter);
-
+        
         adjustDisplaySettings(jgraph);
         getContentPane().add(jgraph);
         resize(DEFAULT_SIZE);
@@ -131,7 +131,7 @@ public class PrecedenceGraph
         }
         
         for (i = 0; i < vertices.length; i++){
-        	positionVertexAt(vertices[i], 130, 40);
+        	positionVertexAt(vertices[i], (int)(Math.random() * DEFAULT_SIZE.width), (int)(Math.random() * DEFAULT_SIZE.height));
         }
     }
 
@@ -159,6 +159,7 @@ public class PrecedenceGraph
     {
         DefaultGraphCell cell = jgAdapter.getVertexCell(vertex);
         AttributeMap attr = cell.getAttributes();
+        
         Rectangle2D bounds = GraphConstants.getBounds(attr);
 
         Rectangle2D newBounds =

@@ -4,6 +4,9 @@
 package cs.ucl.moifm;
 
 import com.opencsv.*;
+import com.orsoncharts.Chart3D;
+import com.orsoncharts.Chart3DPanel;
+import com.orsoncharts.data.xyz.XYZDataset;
 
 import cs.ucl.moifm.model.MMF;
 import cs.ucl.moifm.model.Project;
@@ -13,6 +16,7 @@ import cs.ucl.moifm.util.Genetic;
 import cs.ucl.moifm.util.MCSimulation;
 import cs.ucl.moifm.util.ModelParser;
 import cs.ucl.moifm.util.Plot;
+import cs.ucl.moifm.util.Plot3D;
 import cs.ucl.moifm.util.Population;
 import cs.ucl.moifm.util.PrecedenceGraph;
 
@@ -31,7 +35,7 @@ import javax.swing.JFrame;
  */
 public class Main {
 	
-	public static final int NO_GENERATION = 30;
+	public static final int NO_GENERATION = 2;
 	public static final int POP_SIZE = Genetic.POPULATION_SIZE;
 	public static final String HEADER = "Plan\tExpected NPV\tExpected Cost\tInvestment Risk";
 	public static final String TAB_SEPERATOR = "\t";
@@ -118,9 +122,20 @@ public class Main {
 			precedenceReader.close(); 
 			long runtime = System.currentTimeMillis() - startTime;
 			System.out.println("Runtime = " + (runtime / 1000)/60 + " Minutes");
-			Plot sd = new Plot(pareto, Genetic.allSolution);
-			sd.setCanvasType("newt");
-			AnalysisLauncher.open(sd);
+			
+//			Plot sd = new Plot(pareto, Genetic.allSolution);
+//			sd.setCanvasType("newt");
+//			AnalysisLauncher.open(sd);
+			
+			Plot3D scatter = new Plot3D(pareto, Genetic.allSolution);
+	    	XYZDataset data = scatter.createDataset();
+	    	Chart3D chart = scatter.createChart(data);
+	    	Chart3DPanel panel = new Chart3DPanel(chart);
+	    	panel.setPreferredSize(new java.awt.Dimension(700, 400));
+	    	scatter.add(panel);
+	    	scatter.pack();
+	    	scatter.setLocationRelativeTo(null);
+	    	scatter.setVisible(true);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
