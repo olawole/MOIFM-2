@@ -60,12 +60,12 @@ public class Plot extends AbstractAnalysis {
 //		AWTScatterMultiColor scatter = new AWTScatterMultiColor( points, new ColorMapper( new ColorMapRainbow(), -0.5f, 0.5f ) );
 		Scatter scatter2 = new Scatter(domPoints,Color.BLACK);
         chart = AWTChartComponentFactory.chart(Quality.Nicest, getCanvasType());
+        chart = AWTChartComponentFactory.chart(Quality.Nicest, getCanvasType());
         chart.getAxeLayout().setMainColor(Color.BLACK);
         chart.getAxeLayout().setXAxeLabel("Expected Investment Cost");
         chart.getAxeLayout().setYAxeLabel("Expected NPV");
         chart.getAxeLayout().setZAxeLabel("Investment Risk");
         chart.getView().setBackgroundColor(Color.WHITE);
-        
         chart.getScene().add(scatter2);
         chart.getScene().add(scatter);
         ((AWTView)chart.getView()).setTooltips(tooltips);
