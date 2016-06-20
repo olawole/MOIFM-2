@@ -22,25 +22,25 @@ public class MCSimulation {
 	//Number of simulation
 	private static final int N = 10000;
 	
-	private int period;
+//	private int period;
 	
-	private Double[][] sim;
+	private static Double[][] sim;
 	
-	private Double[] avgSim;
+	private static Double[] avgSim;
 	
-	public MCSimulation(int period){
-		
-		this.period = period;
-	}
+//	public MCSimulation(int period){
+//		
+//		this.period = period;
+//	}
 	
-	public void simulate(Project project){
+	public static void simulate(Project project){
 		HashMap<String, Double[][]> scenario = new HashMap<String, Double[][]>();
 		HashMap<String, Double[]> average = new HashMap<String, Double[]>();
 		for(Entry<String, MMF> mmf : project.getMmfs().entrySet()){
 			List<CashDistribution> c = mmf.getValue().getCashvalue();
-			if(period != c.size()) return;
-			sim = new Double[N][period];
-			avgSim = new Double[period];
+			if(project.getPeriods() != c.size()) return;
+			sim = new Double[N][project.getPeriods()];
+			avgSim = new Double[project.getPeriods()];
 			for (int i = 0; i < c.size(); i++){
 				Double sum = 0.0;
 				TriangularDistribution distribution = 
@@ -69,13 +69,13 @@ public class MCSimulation {
 		
 	}
 	
-	public void simulate_sanpv(HashMap<String, Double[][]> scenarios, Project project){
+	public static void simulate_sanpv(HashMap<String, Double[][]> scenarios, Project project){
 		
 		HashMap<String, Double[][]> sanpv = new HashMap<String, Double[][]>();
 		
 		
 		for(Entry<String, Double[][]> mmfScenario : scenarios.entrySet()){
-			Double[][] sanpvList = new Double[N][period];
+			Double[][] sanpvList = new Double[N][project.getPeriods()];
 			String key = mmfScenario.getKey();
 			Double[][] values = mmfScenario.getValue();
 			
@@ -90,7 +90,7 @@ public class MCSimulation {
 		project.setSimSanpv(sanpv);
 	}
 	
-	public Double[] getSaNpvList(double interestRate, Double[] value) {
+	public static Double[] getSaNpvList(double interestRate, Double[] value) {
         int periods = value.length;
         Double sanpv[] = new Double[periods];
         for (int p = 0; p < periods; p++) {
@@ -99,7 +99,7 @@ public class MCSimulation {
         return sanpv;
     }
 	
-	public double getSaNpv(double interestRate, int skipPeriods, Double[] value) {
+	public static double getSaNpv(double interestRate, int skipPeriods, Double[] value) {
         if (skipPeriods < 0) {
             throw new IllegalArgumentException("Invalid startPeriod: "
                     + skipPeriods);

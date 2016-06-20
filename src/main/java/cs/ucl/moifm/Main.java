@@ -49,8 +49,8 @@ public class Main {
 		// TODO Auto-generated method stub
 		try {
 			long startTime = System.currentTimeMillis();
-			CSVReader reader = new CSVReader(new FileReader("input3.csv"));
-			CSVReader precedenceReader = new CSVReader(new FileReader("precedence3.csv"));
+			CSVReader reader = new CSVReader(new FileReader("input2.csv"));
+			CSVReader precedenceReader = new CSVReader(new FileReader("precedence2.csv"));
 			Project project = new Project();
 			ModelParser.fileToModelParser(reader, project);
 			ModelParser.convertFileToPrecedence(precedenceReader, project);
@@ -67,9 +67,8 @@ public class Main {
 	        frame.pack();
 	        frame.setVisible(true);
 	        
-			MCSimulation simu = new MCSimulation(project.getPeriods());
-			simu.simulate(project);
-			simu.simulate_sanpv(project.getSimCashflow(), project);
+			MCSimulation.simulate(project);
+			MCSimulation.simulate_sanpv(project.getSimCashflow(), project);
 			Population pop = new Population(POP_SIZE, project, true);			 
 			for (int i = 0; i < NO_GENERATION; i++){
 				 System.out.println("Generation " + (i+1));
