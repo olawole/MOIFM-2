@@ -11,15 +11,17 @@ public class Genetic {
 	
 	//parameters
 	public static final double MUTATION_RATE = 1.0 / 9.0;
-	public static final String[] MUTATION_OPERATOR = new String[]{"flipzero","swap","flipnonzero"};
+	public static final String[] MUTATION_OPERATOR = new String[]{"swap","flipnonzero"};
 	public static int mutationNumber = 0;
 	public static int crossOverNumber = 0;
-	public static final int POPULATION_SIZE = 100;
+//	public static final int POPULATION_SIZE = 100;
 	public static List<Plan> allSolution = new ArrayList<Plan>();
 	
 	public static Population evolvePopulation(Population pop){
-		Population newPopulation = new Population(POPULATION_SIZE, pop.project, false);
-		Population children = new Population(POPULATION_SIZE, pop.project, false);
+		if (pop.plans.size() < 1)
+			return null;
+		Population newPopulation = new Population(pop.plans.size(), pop.project, false);
+		Population children = new Population(pop.plans.size(), pop.project, false);
 		children = reproduce(pop);
 		newPopulation = selection(pop, children);
 		return newPopulation;
@@ -30,12 +32,12 @@ public class Genetic {
 		if (Math.random() < MUTATION_RATE){
 		int opIndex = (int)(Math.random() * MUTATION_OPERATOR.length);
 		switch (MUTATION_OPERATOR[opIndex]){
-		case "flipzero":
-			mutationNumber += 1;
-			int mutPoint = (int) (child.getChromosome().size() * Math.random());
-			child.getChromosome().remove(mutPoint);
-			child.getChromosome().add(mutPoint, 0);
-			break;
+//		case "flipzero":
+//			mutationNumber += 1;
+//			int mutPoint = (int) (child.getChromosome().size() * Math.random());
+//			child.getChromosome().remove(mutPoint);
+//			child.getChromosome().add(mutPoint, 0);
+//			break;
 		case "swap":
 			mutationNumber += 1;
 			int pos1 = (int) (child.getChromosome().size() * Math.random());
@@ -115,6 +117,7 @@ public class Genetic {
 	
 	public static Population reproduce(Population pop){
 //		System.out.println("Enter Reproduce");
+		final int POPULATION_SIZE = pop.plans.size();
 		Population children = new Population(POPULATION_SIZE, pop.project, false);
 		for (int i = 0; i < POPULATION_SIZE; i++){
 			Plan child;
@@ -123,10 +126,11 @@ public class Genetic {
 				Plan parent_2 = tournamentSelection(pop);
 				child = crossover(parent_1, parent_2,pop.project);
 				mutate(child);
+				if(child.getChromosome().contains(0))
+					repairChromosome(child, pop.project);
 //				System.out.println(child.toString() + " = " + child.isValidPlan(pop.project));
 			} while (!(child.isValidPlan(pop.project)) || Population.archive.contains(child.toString()));
-			if(child.getChromosome().contains(0))
-				repairChromosome(child, pop.project);
+			
 			child.evaluateFitness(pop.project);
 			children.savePlan(i, child);
 			Population.archive.add(child.toString());
@@ -137,7 +141,8 @@ public class Genetic {
 	}
 	
 	public static Population selection(Population parent, Population children){
-		System.out.println("Enter selection");
+//		System.out.println("Enter selection");
+		final int POPULATION_SIZE = parent.plans.size();
 		Population newPopulation = new Population(POPULATION_SIZE, parent.project, false);
 		Population union = new Population(2 * POPULATION_SIZE, parent.project, false);
 		union.plans.addAll(parent.plans);
@@ -151,28 +156,33 @@ public class Genetic {
 			Front front = fronts.get(i);
 			
 			if (inserted + front.members.size() > POPULATION_SIZE){
+				System.out.println("Enter if");
 				front.crowdingDistance();
+				System.out.println("Exit if");
 				break;
 			}
 			int j = 0;
+//			System.out.println("Enter while");
 			while (j < front.members.size()){
 				newPopulation.savePlan(inserted, front.members.get(j));
 				++inserted;
 				++j;
 			}
+//			System.out.println("Exit while");
 			
 		}
 		int remaining = POPULATION_SIZE - inserted;
 		if (remaining > 0){
 			Front f = fronts.get(last_front);
 			int j = 0;
-			f.sortByCrowding(0, fronts.get(last_front).members.size()-1);
+//			f.sortByCrowding(0, fronts.get(last_front).members.size()-1);
+			f.sortByCrowding();
 			for (int i = inserted; i < POPULATION_SIZE; i++){
 				newPopulation.savePlan(inserted, f.members.get(j));
 				j++;
 			}
 		}
-		System.out.println("Exit selection");
+//		System.out.println("Exit selection");
 		return newPopulation;
 	}
 	

@@ -4,8 +4,12 @@ package cs.ucl.moifm;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
+
+import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 
 import org.jfree.ui.RefineryUtilities;
 
@@ -14,6 +18,7 @@ import com.orsoncharts.Chart3D;
 import com.orsoncharts.Chart3DPanel;
 import com.orsoncharts.data.xyz.XYZDataset;
 
+import cs.ucl.moifm.model.MMF;
 import cs.ucl.moifm.model.MMFException;
 import cs.ucl.moifm.model.Plan;
 import cs.ucl.moifm.model.Project;
@@ -24,6 +29,7 @@ import cs.ucl.moifm.util.MCSimulation;
 import cs.ucl.moifm.util.ModelParser;
 import cs.ucl.moifm.util.Plot3D;
 import cs.ucl.moifm.util.Population;
+import cs.ucl.moifm.util.PrecedenceGraph;
 
 public class MOIFM {
 	public static final String HEADER = "Plan\tExpected NPV\tExpected Cost\tInvestment Risk\tPareto?";
@@ -31,7 +37,8 @@ public class MOIFM {
 	public static final String LINE_SEPERATOR = "\n";
 	
 	/**
-	 * 
+	 * Read cash flow values and precedence relationship from a file and parse it
+	 * into a Project object
 	 * 
 	 * @param cashFlowPath file path to the CSV file storing the 
 	 * set of features to be developed together with their 
@@ -57,20 +64,18 @@ public class MOIFM {
 	}
 	
 	/**
-	 * 
+	 * run Monte Carlo Simulation to generate cash flow scenarios
 	 * @param project reference to the current project
-	 * @return {@code Project} object storing simulated values
+	 * 
 	 */
 	
-	public static Project simulate_cf(Project project){
+	public static void simulate_cf(Project project){
 		MCSimulation.simulate(project);
 		MCSimulation.simulate_sanpv(project.getSimCashflow(), project);
-		
-		return project;
 	}
 	
 	/**
-	 * 
+	 * Generates random assignment of features to iterations or periods
 	 * @param size Number of solutions to be generated per generation
 	 * @param project reference to the current project
 	 * @return a population of length {@literal size}
@@ -92,6 +97,7 @@ public class MOIFM {
 	public static Population evolvePopulation(Population initial, int noOfGeneration){
 		Population pop = initial;
 		for (int i = 0; i < noOfGeneration; i++){
+			 System.out.println("Generation " + (i+1));
 			 pop = Genetic.evolvePopulation(pop);
 		}
 		
@@ -99,19 +105,23 @@ public class MOIFM {
 	}
 	
 	/**
-	 * 
+	 * Short-list the Pareto front from the final population of 
+	 * the evolution process
 	 * @param pop obtain the non-dominated solutions from
 	 * the population
 	 * @return Pareto front of the solution
 	 */
 	public static Front getParetoSolutions(Population pop){
 		Front pareto = pop.fastNonDominatedSort().get(0);
-		pareto.sortNpv(0, pareto.members.size() - 1);
+		pareto.sortNpv();
+//		pareto.sortNpv(0, pareto.members.size() - 1);
 		return pareto;
 	}
 	
 	/**
-	 * 
+	 * Plots the dominated and non-dominated solutions on a 
+	 * 3D scatter plot with tool tips showing the objective values
+	 * of each coordinate
 	 * @param pareto a set of non-dominated solutions
 	 * @param dominated a set of dominated solutions
 	 */
@@ -125,10 +135,11 @@ public class MOIFM {
     	scatter.pack();
     	scatter.setLocationRelativeTo(null);
     	scatter.setVisible(true);
+    	scatter.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 	}
 	
 	/**
-	 * 
+	 * Generates a cash flow analysis table of the plan
 	 * @param plan a plan denoting a mapping of features to iterations
 	 * @param project reference to the project
 	 * @return cash flow analysis table
@@ -138,7 +149,8 @@ public class MOIFM {
 	}
 	
 	/**
-	 * 
+	 * Plot the cash flow analysis curve with NPV on y-axis and
+	 * period being on the x-axis
 	 * @param cfa cash flow analysis table
 	 * @param project reference to the project
 	 * @throws Exception 
@@ -153,7 +165,7 @@ public class MOIFM {
 	}
 	
 	/**
-	 * 
+	 * Writes the solutions to a TSV file
 	 * @param pareto a set of non-dominated solutions
 	 * @param dominated a set of dominated solutions
 	 * @throws IOException
@@ -170,7 +182,7 @@ public class MOIFM {
 			 output.append(String.valueOf(dominated.get(i).getExpectedCost()));
 			 output.append(TAB_SEPERATOR);
 			 output.append(String.valueOf(dominated.get(i).getInvestmentRisk()));
-			 output.append(LINE_SEPERATOR);
+			 output.append(TAB_SEPERATOR);
 			 if (pareto.members.contains(dominated.get(i))){
 				 output.append("Yes");
 			 }
@@ -182,6 +194,23 @@ public class MOIFM {
 		output.close();
 	}
 	
-//	public static void writeAnalysisToFile()
+	/**
+	 * Generates precedence graph for the project
+	 * @param project
+	 */
+	public static void precedenceGraph(Project project){
+		List<MMF> m = new ArrayList<MMF>();
+		for (String id : project.getMmfs().keySet()){
+			m.add(project.getMmfs().get(id));
+		}
+		PrecedenceGraph applet = new PrecedenceGraph(m);
+        applet.init();
+        JFrame frame = new JFrame();
+        frame.getContentPane().add(applet);
+        frame.setTitle("Precedence graph for the project");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setVisible(true);
+	}
 	
 }

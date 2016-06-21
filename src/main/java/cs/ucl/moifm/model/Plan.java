@@ -184,7 +184,12 @@ public class Plan {
 				minNPV = statsNpv.getMin();
 				maxNPV = statsNpv.getMax();
 				double npvSD = statsNpv.getStandardDeviation();
-				investmentRisk = Math.abs(expectedNPV / npvSD);
+				if (npvSD == 0){
+					investmentRisk = 0;
+				}
+				else{
+					investmentRisk = Math.abs(expectedNPV / npvSD);
+				}
 				expectedROI = (expectedNPV / Math.abs(expectedCost)) * 100;
 //				System.out.println("Exit Fitness");
 	}
@@ -244,7 +249,7 @@ public class Plan {
 	 * @param project
 	 * @return
 	 */
-	public boolean isValidPlan(Project project){
+	public boolean isValidPlan1(Project project){
 		boolean isValid = true;
 		
 		//for each feature in featurevector
@@ -263,7 +268,7 @@ public class Plan {
 		return isValid;
 	}
 	
-	public boolean isValidPlan1(Project project){
+	public boolean isValidPlan(Project project){
 		boolean isValid = true;
 		
 		//for each feature in featurevector

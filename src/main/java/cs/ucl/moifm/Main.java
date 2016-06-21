@@ -35,8 +35,8 @@ import javax.swing.JFrame;
  */
 public class Main {
 	
-	public static final int NO_GENERATION = 2;
-	public static final int POP_SIZE = Genetic.POPULATION_SIZE;
+	public static final int NO_GENERATION = 20;
+	public static final int POP_SIZE = 50;
 	public static final String HEADER = "Plan\tExpected NPV\tExpected Cost\tInvestment Risk";
 	public static final String TAB_SEPERATOR = "\t";
 	public static final String LINE_SEPERATOR = "\n";
@@ -58,14 +58,14 @@ public class Main {
 			for (String id : project.getMmfs().keySet()){
 				m.add(project.getMmfs().get(id));
 			}
-			PrecedenceGraph applet = new PrecedenceGraph(m);
-	        applet.init();
-	        JFrame frame = new JFrame();
-	        frame.getContentPane().add(applet);
-	        frame.setTitle("Precedence graph for the project");
-	        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	        frame.pack();
-	        frame.setVisible(true);
+//			PrecedenceGraph applet = new PrecedenceGraph(m);
+//	        applet.init();
+//	        JFrame frame = new JFrame();
+//	        frame.getContentPane().add(applet);
+//	        frame.setTitle("Precedence graph for the project");
+//	        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//	        frame.pack();
+//	        frame.setVisible(true);
 	        
 			MCSimulation.simulate(project);
 			MCSimulation.simulate_sanpv(project.getSimCashflow(), project);
@@ -79,26 +79,27 @@ public class Main {
 			}
 			System.out.println("\n----------------------------------------------------------------------");
 			Front pareto = pop.fastNonDominatedSort().get(0);
-			pareto.sortNpv(0, pareto.members.size() - 1);
+//			pareto.sortNpv(0, pareto.members.size() - 1);
+			pareto.sortNpv();
 			for (int i = 0; i < pareto.members.size(); i++){
 				 System.out.println(pareto.members.get(i).transformPlan().toString() + "\tENPV = " + pareto.members.get(i).getExpectedNPV()
 						 + "\tECOST = " + pareto.members.get(i).getExpectedCost() + "\tRisk = " + 
 						 pareto.members.get(i).getInvestmentRisk() + "\tEROI = " + pareto.members.get(i).getExpectedROI());
 			//	 pop.dSequence.get(i).setFitness(project);
 			}
-			Double [][] cfa = pareto.members.get(2).cashFlowAnalysis(pareto.members.get(0).transformPlan(), project);
-			int[] xdata = IntStream.rangeClosed(1, project.getPeriods()).toArray();
-			Double[] ydata = cfa[project.getFeatures().size()+1];
-			final Curve curve = new Curve("Cash Flow Analysis", xdata, ydata);
-		    curve.pack();
-		    RefineryUtilities.centerFrameOnScreen(curve);
-		    curve.setVisible(true);
-			for (int i = 0; i <= project.getFeatures().size()+1; i++){
-				 for (int j = 0; j < cfa[i].length;j++){
-					 System.out.print(cfa[i][j] + "\t");
-				 }
-				 System.out.println();
-			}
+//			Double [][] cfa = pareto.members.get(2).cashFlowAnalysis(pareto.members.get(0).transformPlan(), project);
+//			int[] xdata = IntStream.rangeClosed(1, project.getPeriods()).toArray();
+//			Double[] ydata = cfa[project.getFeatures().size()+1];
+//			final Curve curve = new Curve("Cash Flow Analysis", xdata, ydata);
+//		    curve.pack();
+//		    RefineryUtilities.centerFrameOnScreen(curve);
+//		    curve.setVisible(true);
+//			for (int i = 0; i <= project.getFeatures().size()+1; i++){
+//				 for (int j = 0; j < cfa[i].length;j++){
+//					 System.out.print(cfa[i][j] + "\t");
+//				 }
+//				 System.out.println();
+//			}
 			System.out.println("Solutions Explored = " + Population.archive.size());
 			System.out.println("Mutation = " + Genetic.mutationNumber);
 			System.out.println("Crossover = " + Genetic.crossOverNumber);

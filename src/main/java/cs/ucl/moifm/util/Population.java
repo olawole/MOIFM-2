@@ -14,6 +14,7 @@ public class Population {
 	
 	public static List<String> archive = new ArrayList<String>();
 	public static List<String> invalid = new ArrayList<String>();
+	public static Double[] MARGIN = new Double[]{0.0, 0.0, 0.0};
 	
 	public Project project;
 	
@@ -34,7 +35,7 @@ public class Population {
 				Plan newPlan = new Plan(proj.getFeatures().size(), proj);
 				do{
 					newPlan.generatePlan(proj);
-				} while (!(newPlan.isValidPlan(proj)) && !Population.archive.contains(newPlan.toString()));
+				} while (!(newPlan.isValidPlan(proj)) || Population.archive.contains(newPlan.toString()));
 				newPlan.evaluateFitness(project);
 				savePlan(counter++, newPlan);
 				Population.archive.add(newPlan.toString());
@@ -77,7 +78,7 @@ public class Population {
 	}
 	
 	public List<Front> fastNonDominatedSort(){
-		System.out.println("Enter Fast");
+//		System.out.println("Enter Fast");
 		List<Front> fronts = new ArrayList<Front>(5);
 		Front first = new Front(0);
 		
@@ -85,6 +86,9 @@ public class Population {
 			p.domCount = 0;
 			p.domSet.clear();
 			for (Plan q : plans){
+				if (p.equals(q)){
+					continue;
+				}
 				if (dominates(p,q)){
 					p.domSet.add(q);
 				}
@@ -115,7 +119,7 @@ public class Population {
 			fronts.add(nextFront);
  
 		}
-		System.out.println("Exit Fast");
+//		System.out.println("Exit Fast");
 		return fronts;
 
 	}
@@ -123,9 +127,9 @@ public class Population {
 	public boolean dominates (Plan plan, Plan plan2){
 		boolean dominate = false;
 		
-		if (plan.getExpectedCost() >= plan2.getExpectedCost() &&
-				plan.getExpectedNPV() >= plan2.getExpectedNPV() &&
-				plan.getInvestmentRisk() <= plan2.getInvestmentRisk()){
+		if (plan.getExpectedCost() >= plan2.getExpectedCost() + MARGIN[0] &&
+				plan.getExpectedNPV() >= plan2.getExpectedNPV() + MARGIN[1] &&
+				plan.getInvestmentRisk() <= plan2.getInvestmentRisk() + MARGIN[2]){
 			dominate = true;
 		}
 		
