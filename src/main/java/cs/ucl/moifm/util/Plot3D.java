@@ -41,7 +41,7 @@ public class Plot3D extends JFrame {
         ScatterXYZRenderer renderer = (ScatterXYZRenderer) plot.getRenderer();
         plot.setDimensions(new Dimension3D(10, 6, 10));
         renderer.setSize(0.1);
-        renderer.setColors(new Color(255, 128, 128), new Color(128, 255, 128));
+        renderer.setColors(new Color(255, 128, 128), new Color(0, 255, 0));
 //        LogAxis3D yAxis = new LogAxis3D("Y (log scale)");
 //        yAxis.setTickLabelOrientation(LabelOrientation.PERPENDICULAR);
 //        yAxis.receive(new ChartStyler(chart.getStyle()));
@@ -56,7 +56,7 @@ public class Plot3D extends JFrame {
      * demo self-contained - in practice you would normally read your data
      * from a file, database or other source).
      * 
-     * @return A sample dataset.
+     * @return A dataset.
      */
     public XYZDataset createDataset() {
         XYZSeries s1 = new XYZSeries("Non-dominated Solution");

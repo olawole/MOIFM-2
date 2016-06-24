@@ -268,7 +268,7 @@ public class Plan {
 		return isValid;
 	}
 	
-	public boolean isValidPlan(Project project){
+	public boolean isValidPlan2(Project project){
 		boolean isValid = true;
 		
 		//for each feature in featurevector
@@ -281,17 +281,41 @@ public class Plan {
 			if (precursor == ""){
 				continue;
 			}
-			int precursorIndex = featureVector.indexOf(precursor);
-//			if (chromosome.get(precursorIndex) == 0){
-//				return false;
-//			}
-			
+			int precursorIndex = featureVector.indexOf(precursor);			
 			if (chromosome.get(i) < chromosome.get(precursorIndex)){
 				return false;
 			}
 			else if (chromosome.get(i) == chromosome.get(precursorIndex)){
 				if (chromosome.get(i) != 0)
 					return false;
+			}
+		}
+		// if 
+		return isValid;
+	}
+	
+	public boolean isValidPlan(Project project){
+		boolean isValid = true;
+		
+		//for each feature in featurevector
+		for (int i = 0; i < chromosome.size(); i++){
+			if (chromosome.get(i) == 0){
+				continue;
+			}
+			String featureId = featureVector.get(i);
+			for (MMF feature : project.getMmfs().get(featureId).getPrecursors()){
+				String precursor = feature.getId();
+				if (precursor == ""){
+					continue;
+				}
+				int precursorIndex = featureVector.indexOf(precursor);			
+				if (chromosome.get(i) < chromosome.get(precursorIndex)){
+					return false;
+				}
+				else if (chromosome.get(i) == chromosome.get(precursorIndex)){
+					if (chromosome.get(i) != 0)
+						return false;
+				}
 			}
 		}
 		// if 

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import cs.ucl.moifm.model.MMF;
 import cs.ucl.moifm.model.Plan;
 import cs.ucl.moifm.model.Project;
 
@@ -11,6 +12,7 @@ public class Genetic {
 	
 	//parameters
 	public static final double MUTATION_RATE = 1.0 / 9.0;
+	public static final double CROSSOVER_PROBABILITY = 0.8;
 	public static final String[] MUTATION_OPERATOR = new String[]{"swap","flipnonzero"};
 	public static int mutationNumber = 0;
 	public static int crossOverNumber = 0;
@@ -156,9 +158,9 @@ public class Genetic {
 			Front front = fronts.get(i);
 			
 			if (inserted + front.members.size() > POPULATION_SIZE){
-				System.out.println("Enter if");
+//				System.out.println("Enter if");
 				front.crowdingDistance();
-				System.out.println("Exit if");
+//				System.out.println("Exit if");
 				break;
 			}
 			int j = 0;
@@ -201,15 +203,17 @@ public class Genetic {
 			}
 			else {
 				String featureId = plan.featureVector.get(i);
-				String precursor = project.getMmfs().get(featureId).getPrecursorString();
-				if (precursor == ""){
-					continue;
-				}
-				int precursorIndex = plan.featureVector.indexOf(precursor);
+				for (MMF feature : project.getMmfs().get(featureId).getPrecursors()){
+					String precursor = feature.getId();
+					if (precursor == ""){
+						continue;
+					}
+					int precursorIndex = plan.featureVector.indexOf(precursor);
 				
-				if(plan.getChromosome().get(precursorIndex) == 0){
-					plan.getChromosome().remove(i);
-					plan.getChromosome().add(i, 0);
+					if(plan.getChromosome().get(precursorIndex) == 0){
+						plan.getChromosome().remove(i);
+						plan.getChromosome().add(i, 0);
+					}
 				}
 			}
 		}

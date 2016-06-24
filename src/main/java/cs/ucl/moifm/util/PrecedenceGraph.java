@@ -116,7 +116,15 @@ public class PrecedenceGraph
         resize(DEFAULT_SIZE);
         HashMap<String, String> mapping = new HashMap<String, String>();
         for (MMF mmf : features){
-        	mapping.put(mmf.getId(), mmf.getPrecursorString());
+        	String value = "";
+        	for (MMF prec : mmf.getPrecursors()){
+        		if (value == ""){
+        			value += prec.getId();
+        		}
+        		else
+        			value += "," + prec.getId();
+        	}
+        	mapping.put(mmf.getId(), value);
         }
         String[] vertices = new String[features.size()];
         int i = 0;
@@ -126,8 +134,12 @@ public class PrecedenceGraph
         	i++;
         }
         for (i = 0; i < vertices.length; i++){
-        	if (mapping.get(vertices[i]) != "")
-        		g.addEdge(vertices[i], mapping.get(vertices[i]));
+        	if (mapping.get(vertices[i]) != ""){
+        		for (String s : mapping.get(vertices[i]).split(",")){
+        			g.addEdge(vertices[i], s);
+        		}
+        		
+        	}
         }
         
         for (i = 0; i < vertices.length; i++){

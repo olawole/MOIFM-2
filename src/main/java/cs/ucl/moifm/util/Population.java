@@ -14,7 +14,7 @@ public class Population {
 	
 	public static List<String> archive = new ArrayList<String>();
 	public static List<String> invalid = new ArrayList<String>();
-	public static Double[] MARGIN = new Double[]{0.0, 0.0, 0.0};
+	public static Double[] MARGIN = new Double[]{30.0, 50.0, 0.5};
 	
 	public Project project;
 	
