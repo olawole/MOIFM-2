@@ -35,6 +35,7 @@ public class Curve extends ApplicationFrame {
 			series.add(xdata[i], ydata[i]);
 		}
         final XYSeriesCollection data = new XYSeriesCollection(series);
+        
         final JFreeChart chart = ChartFactory.createXYLineChart(
         		"Cash Flow Analysis",
             "Period", 
@@ -46,13 +47,13 @@ public class Curve extends ApplicationFrame {
             false
         );
        
-        Number minimum = DatasetUtilities.findMinimumRangeValue(data);
-        ValueMarker min = new ValueMarker(minimum.floatValue());
-        min.setPaint(Color.blue);
-        min.setLabel("Self-funding status");
-        min.setLabelTextAnchor(TextAnchor.CENTER_LEFT);
+   //     Number minimum = DatasetUtilities.findMinimumRangeValue(data);
+   //     ValueMarker min = new ValueMarker(minimum.floatValue());
+   //     min.setPaint(Color.blue);
+   //     min.setLabel("Self-funding status");
+   //     min.setLabelTextAnchor(TextAnchor.CENTER_LEFT);
         final ChartPanel chartPanel = new ChartPanel(chart);
-        chart.getXYPlot().addRangeMarker(min);
+   //     chart.getXYPlot().addRangeMarker(min);
         chart.getXYPlot().setRangeZeroBaselineVisible(true);
         chart.getXYPlot().setDomainZeroBaselineVisible(true);
         chart.getXYPlot().setRenderer(new XYSplineRenderer());

@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -148,6 +149,18 @@ public class MOIFM {
 		return plan.cashFlowAnalysis(plan.transformPlan(), project);
 	}
 	
+	public static HashMap<String,Double[][]> CashAnalysis(ArrayList<Plan> plans, Project project){
+		HashMap<String, Double[][]> analysis = new HashMap<String, Double[][]>();
+		Double[][] data;
+		String label;
+		for (Plan plan:plans){
+			data = plan.cashFlowAnalysis(plan.transformPlan(), project);
+			label = plan.transformPlan().toString();
+			if (!analysis.containsKey(label))
+				analysis.put(label, data);
+		}
+		return analysis; 
+	}
 	/**
 	 * Plot the cash flow analysis curve with NPV on y-axis and
 	 * period being on the x-axis

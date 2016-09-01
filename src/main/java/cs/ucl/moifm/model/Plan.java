@@ -188,7 +188,7 @@ public class Plan {
 					investmentRisk = 0;
 				}
 				else{
-					investmentRisk = Math.abs(expectedNPV / npvSD);
+					investmentRisk = Math.abs(npvSD / expectedNPV);
 				}
 				expectedROI = (expectedNPV / Math.abs(expectedCost)) * 100;
 //				System.out.println("Exit Fitness");

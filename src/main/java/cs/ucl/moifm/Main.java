@@ -10,25 +10,16 @@ import com.orsoncharts.data.xyz.XYZDataset;
 
 import cs.ucl.moifm.model.MMF;
 import cs.ucl.moifm.model.Project;
-import cs.ucl.moifm.util.Curve;
 import cs.ucl.moifm.util.Front;
 import cs.ucl.moifm.util.Genetic;
 import cs.ucl.moifm.util.MCSimulation;
 import cs.ucl.moifm.util.ModelParser;
-import cs.ucl.moifm.util.Plot;
 import cs.ucl.moifm.util.Plot3D;
 import cs.ucl.moifm.util.Population;
-import cs.ucl.moifm.util.PrecedenceGraph;
-
-import org.jfree.ui.RefineryUtilities;
-import org.jzy3d.analysis.AnalysisLauncher;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
-import javax.swing.JFrame;
 /**
  * @author Olawole
  *
