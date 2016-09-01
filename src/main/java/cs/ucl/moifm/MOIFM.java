@@ -155,10 +155,10 @@ public class MOIFM {
 	 * @param project reference to the project
 	 * @throws Exception 
 	 */
-	public static void analyisCurve(Double[][] cfa, Project project) throws Exception{
+	public static void analyisCurve(Double[][] cfa, Project project,String name) throws Exception{
 		int[] xdata = IntStream.rangeClosed(1, project.getPeriods()).toArray();
 		Double[] ydata = cfa[project.getFeatures().size()+1];
-		final Curve curve = new Curve("Cash Flow Analysis", xdata, ydata);
+		final Curve curve = new Curve("Cash Flow Analysis", xdata, ydata,name);
 	    curve.pack();
 	    RefineryUtilities.centerFrameOnScreen(curve);
 	    curve.setVisible(true);

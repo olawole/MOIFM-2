@@ -20,7 +20,7 @@ import org.apache.commons.math3.distribution.TriangularDistribution;
 public class MCSimulation {
 	
 	//Number of simulation
-	private static final int N = 10000;
+	private static final int N = 1000;
 	
 //	private int period;
 	

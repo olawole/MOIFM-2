@@ -14,7 +14,7 @@ public class Population {
 	
 	public static List<String> archive = new ArrayList<String>();
 	public static List<String> invalid = new ArrayList<String>();
-	public static Double[] MARGIN = new Double[]{30.0, 50.0, 0.5};
+	public static Double[] MARGIN = new Double[]{30.0, 50.0, 0.1};
 	
 	public Project project;
 	
@@ -124,16 +124,34 @@ public class Population {
 
 	}
 	
-	public boolean dominates (Plan plan, Plan plan2){
+	public boolean dominates (Plan plan1, Plan plan2){
 		boolean dominate = false;
 		
-		if (plan.getExpectedCost() >= plan2.getExpectedCost() + MARGIN[0] &&
-				plan.getExpectedNPV() >= plan2.getExpectedNPV() + MARGIN[1] &&
-				plan.getInvestmentRisk() <= plan2.getInvestmentRisk() + MARGIN[2]){
+		if (all(plan1,plan2) && any(plan1,plan2)){
 			dominate = true;
 		}
 		
 		return dominate;
+	}
+	
+	public boolean all (Plan plan1, Plan plan2){
+		boolean value = false;
+		if (plan1.getExpectedCost() >= plan2.getExpectedCost() &&
+				plan1.getExpectedNPV() >= plan2.getExpectedNPV() &&
+				plan1.getInvestmentRisk() <= plan2.getInvestmentRisk()){
+			value = true;
+		}
+		return value;
+	}
+	
+	public boolean any (Plan plan1, Plan plan2){
+		boolean value = false;
+		if (plan1.getExpectedCost() > plan2.getExpectedCost() + MARGIN[0] ||
+				plan1.getExpectedNPV() > plan2.getExpectedNPV() + MARGIN[1] ||
+				plan1.getInvestmentRisk() < plan2.getInvestmentRisk() + MARGIN[2]){
+			value = true;
+		}
+		return value;
 	}
 
 }
