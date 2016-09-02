@@ -149,11 +149,15 @@ public class MOIFM {
 		return plan.cashFlowAnalysis(plan.transformPlan(), project);
 	}
 	
-	public static HashMap<String,Double[][]> CashAnalysis(ArrayList<Plan> plans, Project project){
+	public static HashMap<String,Double[][]> CashAnalysis(List<Plan> plans, Project project){
 		HashMap<String, Double[][]> analysis = new HashMap<String, Double[][]>();
 		Double[][] data;
 		String label;
+		int count = 0;
 		for (Plan plan:plans){
+			if (++count > 10){
+				break;
+			}
 			data = plan.cashFlowAnalysis(plan.transformPlan(), project);
 			label = plan.transformPlan().toString();
 			if (!analysis.containsKey(label))
@@ -177,6 +181,12 @@ public class MOIFM {
 	    curve.setVisible(true);
 	}
 	
+	public static void analyisCurve(HashMap<String, Double[][]> data, int period, int features) throws Exception{
+		final Curve curve = new Curve("Cash Flow Analysis", data, period,features);
+	    curve.pack();
+	    RefineryUtilities.centerFrameOnScreen(curve);
+	    curve.setVisible(true);
+	}
 	/**
 	 * Writes the solutions to a TSV file
 	 * @param pareto a set of non-dominated solutions

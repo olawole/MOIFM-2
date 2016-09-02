@@ -1,6 +1,7 @@
 package cs.ucl.moifm;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import cs.ucl.moifm.model.MMFException;
 import cs.ucl.moifm.model.Project;
@@ -18,13 +19,15 @@ public class Main2 {
 //			MOIFM.precedenceGraph(project);
 			MOIFM.simulate_cf(project);
 			Population randomPop = MOIFM.generateRandomPlan(100, project);
-			Population finalPop = MOIFM.evolvePopulation(randomPop, 50);
+			Population finalPop = MOIFM.evolvePopulation(randomPop, 500);
 			Front pareto = MOIFM.getParetoSolutions(finalPop);
 			System.out.println(pareto.members.size());
 			MOIFM.drawScatterPlot(pareto, Genetic.allSolution);
 			MOIFM.writeSolutionsToFile(pareto, Genetic.allSolution);
-			Double[][] cfa = MOIFM.planCashAnalysis(pareto.members.get(0), project);
-			MOIFM.analyisCurve(cfa, project,pareto.members.get(0).transformPlan().toString());
+			HashMap<String, Double[][]> Analysis = MOIFM.CashAnalysis(pareto.members, project);
+			MOIFM.analyisCurve(Analysis, project.getPeriods(),project.getFeatures().size());
+	//		Double[][] cfa = MOIFM.planCashAnalysis(pareto.members.get(0), project);
+	//		MOIFM.analyisCurve(cfa, project,pareto.members.get(0).transformPlan().toString());
 			long runtime = System.currentTimeMillis() - startTime;
 			System.out.println("Runtime = " + (runtime / 1000)/60 + " Minutes");
 		} catch (IOException e) {
