@@ -18,7 +18,7 @@ public class Main2 {
 			Project project = MOIFM.parseModel("input3.csv", "precedence3.csv", 0.00241);
 //			MOIFM.precedenceGraph(project);
 			MOIFM.simulate_cf(project);
-			Population randomPop = MOIFM.generateRandomPlan(100, project);
+			Population randomPop = MOIFM.generateRandomPlan(50, project);
 			Population finalPop = MOIFM.evolvePopulation(randomPop, 500);
 			Front pareto = MOIFM.getParetoSolutions(finalPop);
 			System.out.println(pareto.members.size());
