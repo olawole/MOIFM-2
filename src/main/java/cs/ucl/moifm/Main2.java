@@ -15,11 +15,11 @@ public class Main2 {
 		// TODO Auto-generated method stub
 		try {
 			long startTime = System.currentTimeMillis();
-			Project project = MOIFM.parseModel("input3.csv", "precedence3.csv", 0.00241);
+			Project project = MOIFM.parseModel("input21.csv", "precedence21.csv", 0.00241);
 //			MOIFM.precedenceGraph(project);
 			MOIFM.simulate_cf(project);
 			Population randomPop = MOIFM.generateRandomPlan(50, project);
-			Population finalPop = MOIFM.evolvePopulation(randomPop, 500);
+			Population finalPop = MOIFM.evolvePopulation(randomPop, 50);
 			Front pareto = MOIFM.getParetoSolutions(finalPop);
 			System.out.println(pareto.members.size());
 			MOIFM.drawScatterPlot(pareto, Genetic.allSolution);
