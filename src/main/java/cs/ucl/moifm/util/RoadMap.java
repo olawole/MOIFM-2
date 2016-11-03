@@ -1,5 +1,7 @@
 package cs.ucl.moifm.util;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -50,17 +52,33 @@ public class RoadMap {
 	
 	public void writeDot(){
 		String dotString = "digraph G { \n";
+		dotString += "root[shape=point]\n";
 	//	List<String> nodes = new ArrayList<String>();
 		for (Plan p : optimal){
 			HashMap<Integer, String> solution = p.transformPlan();
+			solution.remove(0);
 			System.out.println(solution.toString());
 			Iterator<String> it = solution.values().iterator();
+			if (it.hasNext()){
 			String object = it.next();
+			if (dotString.indexOf( "root -> \"" + object + "\"\n") < 0){
+				dotString += "\"" + object + "\"[shape = box]\n";  
+				dotString += "root -> \"" + object + "\"\n"; 
+			}
+			
 			while (it.hasNext()){
 				String current = it.next();
-				dotString += "\"" + object + "\"" + "->" + "\"" + current + "\"\n";
-				System.out.println("\"" + object + "\"" + "->" + "\"" + current + "\"\n");
+				if (dotString.indexOf( "\"" + current + "\"[shape = box, style=rounded]\n") < 0){
+					dotString += "\"" + current + "\"[shape = box, style=rounded]\n";
+				}
+				 
+				String str = "\"" + object + "\"" + "->" + "\"" + current + "\"\n";
+				if (dotString.indexOf(str) < 0){
+					dotString += str;
+				}
+
 				object = current;
+			}
 			}
 //			for (Map.Entry<Integer, String> entry : solution.entrySet()){
 //				String object = entry.getValue();
@@ -75,6 +93,14 @@ public class RoadMap {
 //			
 //		}
 	//	System.out.println(dotString);
+		try {
+			FileWriter output = new FileWriter("roadmap.dot");
+			output.write(dotString);
+			output.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	
