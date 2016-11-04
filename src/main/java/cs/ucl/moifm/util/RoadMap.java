@@ -53,6 +53,7 @@ public class RoadMap {
 	public void writeDot(){
 		HashMap<Integer, String> rank = new HashMap<Integer, String>();
 		String all = "";
+		String lastNode = "";
 		String dotString = "digraph G { \n";
 		dotString += "\trankdir=LR\n";
 		dotString += "\troot[shape=point]\n";
@@ -107,23 +108,23 @@ public class RoadMap {
 				 
 				String str = "\t\"" + object + "\"" + "->" + "\"" + current;
 				if (dotString.indexOf(str) < 0){
-					label += "#" + current;
+					label += "|" + current;
 					dotString += str + "\"[label=\"" + label + "\"]\n";
 				}
 				else {
-					label += "#" + current;
+					label += "|" + current;
 				}
 
 				object = current;
+				lastNode = object;
 			}
 			}
-//			for (Map.Entry<Integer, String> entry : solution.entrySet()){
-//				String object = entry.getValue();
-//				if (!nodes.contains(object)){
-//					nodes.add(object);
-//					
-//				}
-//			}
+			Double cost = p.getExpectedCost();
+			Double value = p.getExpectedNPV();
+//			Double risk = p.getInvestmentRisk() * 100;
+			//lastNode.replaceAll("#", "");
+			dotString += "\t\"" + lastNode + "\"->\"" + label + "\"[label=\"Cost = " + cost + " | Value = " + value + "\"]\n";
+			
 		}
 		for (Integer k : rank.keySet()){
 			dotString += "\t{ rank=same " + rank.get(k) + " }\n";
