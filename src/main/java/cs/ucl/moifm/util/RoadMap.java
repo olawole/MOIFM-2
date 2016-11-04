@@ -65,7 +65,7 @@ public class RoadMap {
 			Iterator<String> it = solution.values().iterator();
 			if (it.hasNext()){
 			String object = it.next();
-			if (dotString.indexOf( "root -> \"" + object) < 0){
+			if (dotString.indexOf( "root -> \"" + object + "\"") < 0){
 				dotString += "\t\"" + object + "\"[shape = box]\n";
 				label += object;
 				dotString += "\troot -> \"" + object + "\"[label=\"" + label + "\"]\n";
