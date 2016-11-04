@@ -51,30 +51,67 @@ public class RoadMap {
 //	}
 	
 	public void writeDot(){
+		HashMap<Integer, String> rank = new HashMap<Integer, String>();
+		String all = "";
 		String dotString = "digraph G { \n";
-		dotString += "root[shape=point]\n";
+		dotString += "\trankdir=LR\n";
+		dotString += "\troot[shape=point]\n";
 	//	List<String> nodes = new ArrayList<String>();
 		for (Plan p : optimal){
 			HashMap<Integer, String> solution = p.transformPlan();
+			String label = "";
 			solution.remove(0);
 			System.out.println(solution.toString());
 			Iterator<String> it = solution.values().iterator();
 			if (it.hasNext()){
 			String object = it.next();
-			if (dotString.indexOf( "root -> \"" + object + "\"\n") < 0){
-				dotString += "\"" + object + "\"[shape = box]\n";  
-				dotString += "root -> \"" + object + "\"\n"; 
+			if (dotString.indexOf( "root -> \"" + object) < 0){
+				dotString += "\t\"" + object + "\"[shape = box]\n";
+				label += object;
+				dotString += "\troot -> \"" + object + "\"[label=\"" + label + "\"]\n";
+				Integer key = getKeyFromValue(solution, object);
+				if (!all.contains("\"" + object + "\"")){
+					if (rank.containsKey(key)){
+						String old = rank.get(key);
+						rank.put(key, old + " \"" + object + "\"");
+					
+					}
+					else {
+						rank.put(key, "\"" + object + "\"");
+					}
+					all += "\"" + object + "\",";
+				}
+			}
+			else {
+				label += object;
 			}
 			
 			while (it.hasNext()){
 				String current = it.next();
 				if (dotString.indexOf( "\"" + current + "\"[shape = box, style=rounded]\n") < 0){
-					dotString += "\"" + current + "\"[shape = box, style=rounded]\n";
+					dotString += "\t\"" + current + "\"[shape = box, style=rounded]\n";
+					Integer key = getKeyFromValue(solution, current);
+					if (!all.contains("\"" + current + "\"")){
+						if (rank.containsKey(key)){
+							String old = rank.get(key);
+							rank.put(key, old + " \"" + current + "\"");
+						}
+						else {
+							rank.put(key, "\"" + current + "\"");
+						}
+						all += "\"" + current + "\",";
+					}
 				}
+					
+				
 				 
-				String str = "\"" + object + "\"" + "->" + "\"" + current + "\"\n";
+				String str = "\t\"" + object + "\"" + "->" + "\"" + current;
 				if (dotString.indexOf(str) < 0){
-					dotString += str;
+					label += "#" + current;
+					dotString += str + "\"[label=\"" + label + "\"]\n";
+				}
+				else {
+					label += "#" + current;
 				}
 
 				object = current;
@@ -87,6 +124,9 @@ public class RoadMap {
 //					
 //				}
 //			}
+		}
+		for (Integer k : rank.keySet()){
+			dotString += "\t{ rank=same " + rank.get(k) + " }\n";
 		}
 		dotString += "}";
 //		for (Map.Entry<Integer, List<String>> entry : map.entrySet()){
@@ -102,6 +142,13 @@ public class RoadMap {
 			e.printStackTrace();
 		}
 	}
-	
+	public Integer getKeyFromValue(HashMap<Integer, String> hm, String value) {
+	    for (Integer key : hm.keySet()) {
+	      if (hm.get(key).equals(value)) {
+	        return key;
+	      }
+	    }
+	    return null;
+	  }
 	
 }
