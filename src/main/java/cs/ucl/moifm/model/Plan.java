@@ -137,6 +137,7 @@ public class Plan {
 			for (Map.Entry<Integer, String> entry : plan.entrySet()){
 				int currentPeriod = entry.getKey();
 				double periodRevenue = 0;
+				double periodCost = 0;
 				double periodInvestment ;
 				if (currentPeriod == 0)
 					continue;
@@ -154,14 +155,21 @@ public class Plan {
 						periodInvestment = getDiscountedValue(project.getInterestRate(), currentPeriod+j, 
 								project.getSimCashflow().get(feature)[k][j]);
 						periodInvestment += periodRevenue;
-						cost[k] += (periodInvestment < 0) ? periodInvestment: 0;
+						periodCost += (periodInvestment < 0) ? periodInvestment: 0;
 						j++;
 					}
-					
-					//value of the feature
+					if (Math.abs(periodCost) > 800){
+						expectedCost = Double.NEGATIVE_INFINITY;
+						expectedNPV = Double.NEGATIVE_INFINITY;
+						investmentRisk = Double.POSITIVE_INFINITY;
+						return;
+					}
 					npv[k] += project.getSimSanpv().get(feature)[k][currentPeriod-1];
 					executedFeatures.add(feature);
 				}
+				
+				//value of the feature
+				cost[k] += periodCost;
 				
 				
 			}

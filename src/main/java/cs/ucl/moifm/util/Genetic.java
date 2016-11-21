@@ -11,9 +11,9 @@ import cs.ucl.moifm.model.Project;
 public class Genetic {
 	
 	//parameters
-	public static final double MUTATION_RATE = 1.0 / 9.0;
+	public static final double MUTATION_RATE = 1.0 / 12.0;
 	public static final double CROSSOVER_PROBABILITY = 0.8;
-	public static final String[] MUTATION_OPERATOR = new String[]{"swap","flipnonzero"};
+	public static final String[] MUTATION_OPERATOR = new String[]{"swap","swap","swap","flipnonzero"};
 	public static int mutationNumber = 0;
 	public static int crossOverNumber = 0;
 //	public static final int POPULATION_SIZE = 100;

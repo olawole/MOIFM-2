@@ -16,11 +16,11 @@ public class Main2 {
 		// TODO Auto-generated method stub
 		try {
 			long startTime = System.currentTimeMillis();
-			Project project = MOIFM.parseModel("input4.csv", "precedence4.csv", 0.0241);
+			Project project = MOIFM.parseModel("input3.csv", "precedence3.csv", 0.0241);
 	//		MOIFM.precedenceGraph(project);
 			MOIFM.simulate_cf(project);
 			Population randomPop = MOIFM.generateRandomPlan(100, project);
-			Population finalPop = MOIFM.evolvePopulation(randomPop, 10);
+			Population finalPop = MOIFM.evolvePopulation(randomPop, 100);
 			Front pareto = MOIFM.getParetoSolutions(finalPop);
 			System.out.println(pareto.members.size());
 			MOIFM.drawScatterPlot(pareto, Genetic.allSolution);
@@ -28,11 +28,12 @@ public class Main2 {
 			HashMap<String, Double[][]> Analysis = MOIFM.CashAnalysis(pareto.members, project);
 			MOIFM.analyisCurve(Analysis, project.getPeriods(),project.getFeatures().size());
 			RoadMap roadmap = new RoadMap(pareto.members);
-			roadmap.writeDot();
+			roadmap.writeDot1();
+			roadmap.writeDot2();
 	//		Double[][] cfa = MOIFM.planCashAnalysis(pareto.members.get(0), project);
 	//		MOIFM.analyisCurve(cfa, project,pareto.members.get(0).transformPlan().toString());
 			long runtime = System.currentTimeMillis() - startTime;
-			System.out.println("Runtime = " + (runtime / 1000) + " Minutes");
+			System.out.println("Runtime = " + (runtime / 1000) + " Seconds");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
