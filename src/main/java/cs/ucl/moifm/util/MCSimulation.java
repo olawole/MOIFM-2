@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
-import cs.ucl.moifm.model.CashDistribution;
+import cs.ucl.moifm.model.TDistribution;
 import cs.ucl.moifm.model.MMF;
 import cs.ucl.moifm.model.Project;
 
@@ -37,7 +37,7 @@ public class MCSimulation {
 		HashMap<String, Double[][]> scenario = new HashMap<String, Double[][]>();
 		HashMap<String, Double[]> average = new HashMap<String, Double[]>();
 		for(Entry<String, MMF> mmf : project.getMmfs().entrySet()){
-			List<CashDistribution> c = mmf.getValue().getCashvalue();
+			List<TDistribution> c = mmf.getValue().getCashvalue();
 			if(project.getPeriods() != c.size()) return;
 			sim = new Double[N][project.getPeriods()];
 			avgSim = new Double[project.getPeriods()];

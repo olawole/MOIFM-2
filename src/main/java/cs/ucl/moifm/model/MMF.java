@@ -66,7 +66,7 @@ public class MMF {
      */
     private List<Double> cashflow;
     
-    private List<CashDistribution> cashvalue;
+    private List<TDistribution> cashvalue;
     
     /**
      * The project this MMF belongs to.
@@ -85,7 +85,7 @@ public class MMF {
         this.devPeriod = 1;
         this.precursors = new ArrayList<MMF>();
         this.cashflow = new ArrayList<Double>();
-        this.cashvalue = new ArrayList<CashDistribution>();
+        this.cashvalue = new ArrayList<TDistribution>();
     }
     
     /**
@@ -269,7 +269,7 @@ public class MMF {
     public void setCashFlow(List<Double> cash){
     	this.cashflow = cash;
     }
-    public List<CashDistribution> getCashvalue() {
+    public List<TDistribution> getCashvalue() {
 		if (cashvalue == null)
 			setCashValue(cashflow);
     	return cashvalue;
@@ -277,11 +277,11 @@ public class MMF {
 
 	public void setCashValue(List<Double> cash) {
 		int i = 0;
-		List<CashDistribution> cashvalue = new ArrayList<CashDistribution>();
+		List<TDistribution> cashvalue = new ArrayList<TDistribution>();
 		
 		
 		for (Double value : cash){
-			CashDistribution buffer = new CashDistribution();
+			TDistribution buffer = new TDistribution();
 			if (value > 0){
 				buffer.setLeast(0.0);
 				buffer.setMost(1.2 * value);

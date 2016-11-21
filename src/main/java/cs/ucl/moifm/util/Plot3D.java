@@ -7,9 +7,6 @@ import javax.swing.JFrame;
 
 import com.orsoncharts.Chart3D;
 import com.orsoncharts.Chart3DFactory;
-import com.orsoncharts.Chart3DPanel;
-import com.orsoncharts.axis.LabelOrientation;
-import com.orsoncharts.axis.LogAxis3D;
 import com.orsoncharts.data.xyz.XYZDataset;
 import com.orsoncharts.data.xyz.XYZSeries;
 import com.orsoncharts.data.xyz.XYZSeriesCollection;
@@ -17,7 +14,6 @@ import com.orsoncharts.graphics3d.Dimension3D;
 import com.orsoncharts.graphics3d.ViewPoint3D;
 import com.orsoncharts.plot.XYZPlot;
 import com.orsoncharts.renderer.xyz.ScatterXYZRenderer;
-import com.orsoncharts.style.ChartStyler;
 
 import cs.ucl.moifm.model.Plan;
 
@@ -40,7 +36,7 @@ public class Plot3D extends JFrame {
         XYZPlot plot = (XYZPlot) chart.getPlot();
         ScatterXYZRenderer renderer = (ScatterXYZRenderer) plot.getRenderer();
         plot.setDimensions(new Dimension3D(10, 6, 10));
-        renderer.setSize(0.1);
+        renderer.setSize(0.08);
         renderer.setColors(new Color(255, 128, 128), new Color(0, 255, 0));
 //        LogAxis3D yAxis = new LogAxis3D("Y (log scale)");
 //        yAxis.setTickLabelOrientation(LabelOrientation.PERPENDICULAR);
