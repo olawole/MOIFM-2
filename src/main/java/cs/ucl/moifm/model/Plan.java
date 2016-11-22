@@ -47,14 +47,14 @@ public class Plan {
 	
 	//Constructor
 	
-	public Plan(int size, Project project){
+	public Plan(int size){
 		this.chromosome = new ArrayList<Integer>(Collections.nCopies(size, 0));
 		this.expectedCost = 0;
 		this.expectedNPV = 0;
 		this.expectedROI = 0;
 		this.investmentRisk = 0;
 		this.domSet = new ArrayList<Plan>();
-		this.featureVector = project.getFeatures();
+		this.featureVector = Project.getFeatures();
 	}
 	
 	public void setChromosome(List<Integer> chromosome){
@@ -125,49 +125,45 @@ public class Plan {
 	 * 
 	 * @param project reference to the current project
 	 */
-	public void evaluateFitness(Project project){
+	public void evaluateFitness(){
 //		System.out.println("Enter Fitness");
-		Double[] npv = new Double[project.nOfSim];
-		Double[] cost = new Double[project.nOfSim];
+		Double[] npv = new Double[Project.nOfSim];
+		Double[] cost = new Double[Project.nOfSim];
 		HashMap<Integer, String> plan = this.transformPlan();
 						
-		for (int k = 0; k < project.nOfSim; k++){
+		for (int k = 0; k < Project.nOfSim; k++){
 			npv[k] = cost[k] = 0.0;
 			List<String> executedFeatures = new ArrayList<String>();
 			for (Map.Entry<Integer, String> entry : plan.entrySet()){
 				int currentPeriod = entry.getKey();
 				double periodRevenue = 0;
 				double periodCost = 0;
-				double periodInvestment ;
+				double periodInvestment = 0 ;
 				if (currentPeriod == 0)
 					continue;
 				String[] features = entry.getValue().split(",");
 				//get investment cost
 				if (!executedFeatures.isEmpty()){
 					for (String deliveredFeature : executedFeatures){
-						Double value = project.getSimCashflow().get(deliveredFeature)[k][currentPeriod-1];
-						periodRevenue += getDiscountedValue(project.getInterestRate(), currentPeriod, value);
+						Double value = Project.getMmfs().get(deliveredFeature).getValueDistribution().getValue_sim()[k][currentPeriod-1];
+					//	Double value = Project.getSimCashflow().get(deliveredFeature)[k][currentPeriod-1];
+						periodRevenue += getDiscountedValue(Project.getInterestRate(), currentPeriod, value);
 					}
 				}
 				for (String feature : features){
-					int j = 0;
-					while(project.getSimCashflow().get(feature)[k][j] < 0){
-						periodInvestment = getDiscountedValue(project.getInterestRate(), currentPeriod+j, 
-								project.getSimCashflow().get(feature)[k][j]);
-						periodInvestment += periodRevenue;
-						periodCost += (periodInvestment < 0) ? periodInvestment: 0;
-						j++;
-					}
-					if (Math.abs(periodCost) > 800){
-						expectedCost = Double.NEGATIVE_INFINITY;
-						expectedNPV = Double.NEGATIVE_INFINITY;
-						investmentRisk = Double.POSITIVE_INFINITY;
-						return;
-					}
-					npv[k] += project.getSimSanpv().get(feature)[k][currentPeriod-1];
+					periodInvestment += getDiscountedValue(Project.getInterestRate(), currentPeriod, 
+								Project.getMmfs().get(feature).getCostDistribution().getCost_sim()[k]);
+					npv[k] += Project.getSimSanpv().get(feature)[k][currentPeriod-1];
 					executedFeatures.add(feature);
 				}
-				
+				periodInvestment -= periodRevenue;
+				periodCost += (periodInvestment > 0) ? periodInvestment: 0;
+				if (Math.abs(periodCost) > 800){
+					expectedCost = Double.NEGATIVE_INFINITY;
+					expectedNPV = Double.NEGATIVE_INFINITY;
+					investmentRisk = Double.POSITIVE_INFINITY;
+					return;
+				}
 				//value of the feature
 				cost[k] += periodCost;
 				
@@ -175,31 +171,33 @@ public class Plan {
 			}
 		}
 		//Compute expected npv, expected cost and investment risk
-		
-				DescriptiveStatistics statsCost = new DescriptiveStatistics();
-				DescriptiveStatistics statsNpv = new DescriptiveStatistics();
+		expectedValue(cost, npv);
+	}
+	
+	public void expectedValue(Double[] cost, Double[] value){
+		DescriptiveStatistics statsCost = new DescriptiveStatistics();
+		DescriptiveStatistics statsNpv = new DescriptiveStatistics();
 
-				
-				for (int i = 0; i < project.nOfSim; i++){
-					statsNpv.addValue(npv[i]);
-					statsCost.addValue(cost[i]);
-				}
-				
-				expectedCost = statsCost.getMean();
-				minCost = statsCost.getMin();
-				maxCost = statsCost.getMax();
-				expectedNPV = statsNpv.getMean();
-				minNPV = statsNpv.getMin();
-				maxNPV = statsNpv.getMax();
-				double npvSD = statsNpv.getStandardDeviation();
-				if (npvSD == 0){
-					investmentRisk = 0;
-				}
-				else{
-					investmentRisk = Math.abs(npvSD / expectedNPV);
-				}
-				expectedROI = (expectedNPV / Math.abs(expectedCost)) * 100;
-//				System.out.println("Exit Fitness");
+		
+		for (int i = 0; i < Project.nOfSim; i++){
+			statsNpv.addValue(value[i]);
+			statsCost.addValue(cost[i]);
+		}
+		
+		expectedCost = statsCost.getMean();
+		minCost = statsCost.getMin();
+		maxCost = statsCost.getMax();
+		expectedNPV = statsNpv.getMean();
+		minNPV = statsNpv.getMin();
+		maxNPV = statsNpv.getMax();
+		double npvSD = statsNpv.getStandardDeviation();
+		if (npvSD == 0){
+			investmentRisk = 0;
+		}
+		else{
+			investmentRisk = Math.abs(npvSD / expectedNPV);
+		}
+		expectedROI = (expectedNPV / Math.abs(expectedCost)) * 100;
 	}
 	
 	/**
@@ -207,13 +205,13 @@ public class Plan {
 	 * and precedence constraints
 	 * @param project
 	 */
-	public void generatePlan(Project project){	
+	public void generatePlan(){	
 		int noOfFeatures = featureVector.size();
 		int startedFeatures = 0;
 		int unstartedFeatures = noOfFeatures;
 		List<Integer> indexAdded = new ArrayList<Integer>();
 		int period = 0;
-		while(period < project.getPeriods() && startedFeatures < noOfFeatures){
+		while(period < Project.getPeriods() && startedFeatures < noOfFeatures){
 			period++;
 			int randIndex;
 			int noOfFeaturesInPeriod = (int) Math.round(Math.random() * unstartedFeatures);
@@ -257,13 +255,13 @@ public class Plan {
 	 * @param project
 	 * @return
 	 */
-	public boolean isValidPlan1(Project project){
+	public boolean isValidPlan1(){
 		boolean isValid = true;
 		
 		//for each feature in featurevector
 		for (int i = 0; i < chromosome.size(); i++){
 			String featureId = featureVector.get(i);
-			String precursor = project.getMmfs().get(featureId).getPrecursorString();
+			String precursor = Project.getMmfs().get(featureId).getPrecursorString();
 			if (precursor == ""){
 				continue;
 			}
@@ -276,7 +274,7 @@ public class Plan {
 		return isValid;
 	}
 	
-	public boolean isValidPlan2(Project project){
+	public boolean isValidPlan2(){
 		boolean isValid = true;
 		
 		//for each feature in featurevector
@@ -285,7 +283,7 @@ public class Plan {
 				continue;
 			}
 			String featureId = featureVector.get(i);
-			String precursor = project.getMmfs().get(featureId).getPrecursorString();
+			String precursor = Project.getMmfs().get(featureId).getPrecursorString();
 			if (precursor == ""){
 				continue;
 			}
@@ -302,7 +300,7 @@ public class Plan {
 		return isValid;
 	}
 	
-	public boolean isValidPlan(Project project){
+	public boolean isValidPlan(){
 		boolean isValid = true;
 		
 		//for each feature in featurevector
@@ -311,7 +309,7 @@ public class Plan {
 				continue;
 			}
 			String featureId = featureVector.get(i);
-			for (MMF feature : project.getMmfs().get(featureId).getPrecursors()){
+			for (Feature feature : Project.getMmfs().get(featureId).getPrecursors()){
 				String precursor = feature.getId();
 				if (precursor == ""){
 					continue;
@@ -361,8 +359,8 @@ public class Plan {
 	 * @param plan
 	 * @return
 	 */
-	public Double[][] cashFlowAnalysis(HashMap<Integer, String> plan, Project project){
-		Double [][] cFlow = new Double[featureVector.size()+2][project.getPeriods()];
+	public Double[][] cashFlowAnalysis(HashMap<Integer, String> plan){
+		Double [][] cFlow = new Double[featureVector.size()+2][Project.getPeriods()];
 		int row = 0;
 		DecimalFormat df = new DecimalFormat("#.##");
 		for (Map.Entry<Integer, String> entry : plan.entrySet()){
@@ -381,10 +379,15 @@ public class Plan {
 				String[] features = entry.getValue().split(",");
 				for (String feature : features){
 					int column = entry.getKey()-1;
-					Double[] cf = project.getSimAverage().get(feature);
+					Double[] cf = new Double[Project.getPeriods()]; //Project.getSimAverage().get(feature);
+					cf[0] = Project.getMmfs().get(feature).getCostDistribution().getAvg_sim();
+					double[] value = Project.getMmfs().get(feature).getValueDistribution().getAvg_value(); 
+					for (int k = 1; k < cf.length; k++){
+						cf[k] = value[k-1];
+					}
 					int index = 0;
 					while (column < cFlow[row].length){
-						Double discValue = getDiscountedValue(project.getInterestRate(), column+1, cf[index]);
+						Double discValue = getDiscountedValue(Project.getInterestRate(), column+1, cf[index]);
 						cFlow[row][column] = Double.valueOf(df.format(discValue));
 						column++;
 						index++;
@@ -393,7 +396,7 @@ public class Plan {
 				}
 			}
 		}
-		for (int i = 0; i < project.getPeriods(); i++){
+		for (int i = 0; i < Project.getPeriods(); i++){
 			Double sum = 0.0;
 			for (int j = 0; j < featureVector.size();j++){
 				if (cFlow[j][i] != null){
@@ -407,7 +410,7 @@ public class Plan {
 		}
 		
 		Double rollingNpv = 0.0;
-		for (int i = 0; i < project.getPeriods(); i++){
+		for (int i = 0; i < Project.getPeriods(); i++){
 			rollingNpv += cFlow[featureVector.size()][i];
 			cFlow[featureVector.size()+1][i] = Double.valueOf(df.format(rollingNpv));
 		}

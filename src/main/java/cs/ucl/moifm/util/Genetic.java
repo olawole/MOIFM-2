@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import cs.ucl.moifm.model.MMF;
+import cs.ucl.moifm.model.Feature;
 import cs.ucl.moifm.model.Plan;
 import cs.ucl.moifm.model.Project;
 
@@ -22,8 +22,8 @@ public class Genetic {
 	public static Population evolvePopulation(Population pop){
 		if (pop.plans.size() < 1)
 			return null;
-		Population newPopulation = new Population(pop.plans.size(), pop.project, false);
-		Population children = new Population(pop.plans.size(), pop.project, false);
+		Population newPopulation = new Population(pop.plans.size(), false);
+		Population children = new Population(pop.plans.size(), false);
 		children = reproduce(pop);
 		newPopulation = selection(pop, children);
 		return newPopulation;
@@ -67,8 +67,8 @@ public class Genetic {
 	}
 
 	public static Plan crossover(Plan parent_1,
-			Plan parent_2, Project project) {
-		Plan child = new Plan(project.getFeatures().size(), project);
+			Plan parent_2) {
+		Plan child = new Plan(Project.getFeatures().size());
 		int startPos, endPos;
 		do {
 			startPos = (int) (Math.random() * parent_1.getChromosome().size());
@@ -120,20 +120,20 @@ public class Genetic {
 	public static Population reproduce(Population pop){
 //		System.out.println("Enter Reproduce");
 		final int POPULATION_SIZE = pop.plans.size();
-		Population children = new Population(POPULATION_SIZE, pop.project, false);
+		Population children = new Population(POPULATION_SIZE, false);
 		for (int i = 0; i < POPULATION_SIZE; i++){
 			Plan child;
 			do{
 				Plan parent_1 = tournamentSelection(pop);
 				Plan parent_2 = tournamentSelection(pop);
-				child = crossover(parent_1, parent_2,pop.project);
+				child = crossover(parent_1, parent_2);
 				mutate(child);
 				if(child.getChromosome().contains(0))
-					repairChromosome(child, pop.project);
+					repairChromosome(child);
 //				System.out.println(child.toString() + " = " + child.isValidPlan(pop.project));
-			} while (!(child.isValidPlan(pop.project)) || Population.archive.contains(child.toString()));
+			} while (!(child.isValidPlan()) || Population.archive.contains(child.toString()));
 			
-			child.evaluateFitness(pop.project);
+			child.evaluateFitness();
 			children.savePlan(i, child);
 			Population.archive.add(child.toString());
 			allSolution.add(child);
@@ -145,8 +145,8 @@ public class Genetic {
 	public static Population selection(Population parent, Population children){
 //		System.out.println("Enter selection");
 		final int POPULATION_SIZE = parent.plans.size();
-		Population newPopulation = new Population(POPULATION_SIZE, parent.project, false);
-		Population union = new Population(2 * POPULATION_SIZE, parent.project, false);
+		Population newPopulation = new Population(POPULATION_SIZE, false);
+		Population union = new Population(2 * POPULATION_SIZE, false);
 		union.plans.addAll(parent.plans);
 		union.plans.addAll(children.plans);
 		
@@ -196,14 +196,14 @@ public class Genetic {
 			return (candidate1.rank < candidate2.rank);
 	}
 	
-	public static void repairChromosome(Plan plan, Project project){
+	public static void repairChromosome(Plan plan){
 		for(int i = 0; i < plan.getChromosome().size();i++){
 			if (plan.getChromosome().get(i) == 0){
 				continue;
 			}
 			else {
 				String featureId = plan.featureVector.get(i);
-				for (MMF feature : project.getMmfs().get(featureId).getPrecursors()){
+				for (Feature feature : Project.getMmfs().get(featureId).getPrecursors()){
 					String precursor = feature.getId();
 					if (precursor == ""){
 						continue;

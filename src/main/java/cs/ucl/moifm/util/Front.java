@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import cs.ucl.moifm.model.DeliverySequence;
 import cs.ucl.moifm.model.Plan;
 
 /**
@@ -206,13 +205,13 @@ public class Front {
 		}
 	}
 	
-	public boolean crowdedComparison(DeliverySequence d1, DeliverySequence d2){
-		
-		if(d1.rank == d2.rank)
-			return (d1.crowdingDistance > d2.crowdingDistance);
-		else
-			return (d1.rank < d2.rank);
-	}
+//	public boolean crowdedComparison(Plan d1, Plan d2){
+//		
+//		if(d1.rank == d2.rank)
+//			return (d1.crowdingDistance > d2.crowdingDistance);
+//		else
+//			return (d1.rank < d2.rank);
+//	}
 	
 	/**
 	 * Sort the members of the front using the crowding distance

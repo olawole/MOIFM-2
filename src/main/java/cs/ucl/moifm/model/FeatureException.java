@@ -4,26 +4,26 @@ package cs.ucl.moifm.model;
  * Exception to throw when you get an unexpected error in the MMF models. This
  * is only used for errors that should be presented to the user.
  */
-public class MMFException extends Exception {
+public class FeatureException extends Exception {
     private static final long serialVersionUID = 1L;
 
     /**
      *
      */
-    public MMFException() {
+    public FeatureException() {
     }
 
     /**
      * @param message
      */
-    public MMFException(String message) {
+    public FeatureException(String message) {
         super(message);
     }
 
     /**
      * @param cause
      */
-    public MMFException(Throwable cause) {
+    public FeatureException(Throwable cause) {
         super(cause);
     }
 
@@ -31,7 +31,7 @@ public class MMFException extends Exception {
      * @param message
      * @param cause
      */
-    public MMFException(String message, Throwable cause) {
+    public FeatureException(String message, Throwable cause) {
         super(message, cause);
     }
 

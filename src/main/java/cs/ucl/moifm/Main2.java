@@ -3,7 +3,7 @@ package cs.ucl.moifm;
 import java.io.IOException;
 import java.util.HashMap;
 
-import cs.ucl.moifm.model.MMFException;
+import cs.ucl.moifm.model.FeatureException;
 import cs.ucl.moifm.model.Project;
 import cs.ucl.moifm.util.Front;
 import cs.ucl.moifm.util.Genetic;
@@ -18,15 +18,15 @@ public class Main2 {
 			long startTime = System.currentTimeMillis();
 			Project project = MOIFM.parseModel("input3.csv", "precedence3.csv", 0.0241);
 	//		MOIFM.precedenceGraph(project);
-			MOIFM.simulate_cf(project);
-			Population randomPop = MOIFM.generateRandomPlan(100, project);
+			MOIFM.simulate_cf();
+			Population randomPop = MOIFM.generateRandomPlan(100);
 			Population finalPop = MOIFM.evolvePopulation(randomPop, 100);
 			Front pareto = MOIFM.getParetoSolutions(finalPop);
 			System.out.println(pareto.members.size());
 			MOIFM.drawScatterPlot(pareto, Genetic.allSolution);
 			MOIFM.writeSolutionsToFile(pareto, Genetic.allSolution);
-			HashMap<String, Double[][]> Analysis = MOIFM.CashAnalysis(pareto.members, project);
-			MOIFM.analyisCurve(Analysis, project.getPeriods(),project.getFeatures().size());
+			HashMap<String, Double[][]> Analysis = MOIFM.CashAnalysis(pareto.members);
+			MOIFM.analyisCurve(Analysis, Project.getPeriods(),Project.getFeatures().size());
 			RoadMap roadmap = new RoadMap(pareto.members);
 			roadmap.writeDot1();
 			roadmap.writeDot2();
@@ -37,7 +37,7 @@ public class Main2 {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (MMFException e) {
+		} catch (FeatureException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (Exception e) {

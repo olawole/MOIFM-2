@@ -15,7 +15,7 @@ import javax.swing.JTable;
 import javax.swing.LayoutStyle;
 import javax.swing.table.TableColumn;
 
-import cs.ucl.moifm.model.MMF;
+import cs.ucl.moifm.model.Feature;
 import cs.ucl.moifm.model.Project;
 
 //import no.ntnu.mmfplanner.model.Category;

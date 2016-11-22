@@ -11,12 +11,16 @@ public class Cost {
 	
 	private double[] cost_sim;
 	
+	private double avg_sim;
+	
 	public Cost(double amount, double over, double under){
 		this.setCost_amount(amount);
 		this.setIndus_over_estimation(over);
 		this.setIndus_under_estimation(under);
 		setDistribution(new TDistribution(cost_amount * indus_over_estimation, cost_amount * indus_over_estimation, cost_amount));
 	}
+	
+	public Cost(){}
 
 	public double getCost_amount() {
 		return cost_amount;
@@ -56,5 +60,13 @@ public class Cost {
 
 	public void setCost_sim(double[] cost_sim) {
 		this.cost_sim = cost_sim;
+	}
+
+	public double getAvg_sim() {
+		return avg_sim;
+	}
+
+	public void setAvg_sim(double avg_sim) {
+		this.avg_sim = avg_sim;
 	}
 }

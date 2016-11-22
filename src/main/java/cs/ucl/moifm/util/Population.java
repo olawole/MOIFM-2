@@ -1,10 +1,8 @@
 package cs.ucl.moifm.util;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import cs.ucl.moifm.model.DeliverySequence;
 import cs.ucl.moifm.model.Plan;
 import cs.ucl.moifm.model.Project;
 
@@ -16,7 +14,6 @@ public class Population {
 	public static List<String> invalid = new ArrayList<String>();
 	public static Double[] MARGIN = new Double[]{0.0, 0.0, 0.0};
 	
-	public Project project;
 	
 	/*
 	 * Generate initial population for the Genetic process
@@ -25,18 +22,18 @@ public class Population {
 	 *  @param proj
 	 *  @param initialize
 	 */
-	public Population(int populationSize, Project proj, boolean initialize){
+	public Population(int populationSize, boolean initialize){
 		plans = new ArrayList<Plan>(populationSize);
 	//	Population.archive = new ArrayList<String>();
-		this.project = proj;
-		if (initialize && proj != null){
+		
+		if (initialize){
 			int counter = 0;
 			while (counter < populationSize){
-				Plan newPlan = new Plan(proj.getFeatures().size(), proj);
+				Plan newPlan = new Plan(Project.getFeatures().size());
 				do{
-					newPlan.generatePlan(proj);
-				} while (!(newPlan.isValidPlan(proj)) || Population.archive.contains(newPlan.toString()));
-				newPlan.evaluateFitness(project);
+					newPlan.generatePlan();
+				} while (!(newPlan.isValidPlan()) || Population.archive.contains(newPlan.toString()));
+				newPlan.evaluateFitness();
 				savePlan(counter++, newPlan);
 				Population.archive.add(newPlan.toString());
 			}
@@ -136,7 +133,7 @@ public class Population {
 	
 	public boolean all (Plan plan1, Plan plan2){
 		boolean value = false;
-		if (plan1.getExpectedCost() >= plan2.getExpectedCost() &&
+		if (plan1.getExpectedCost() <= plan2.getExpectedCost() &&
 				plan1.getExpectedNPV() >= plan2.getExpectedNPV() &&
 				plan1.getInvestmentRisk() <= plan2.getInvestmentRisk()){
 			value = true;
@@ -146,7 +143,7 @@ public class Population {
 	
 	public boolean any (Plan plan1, Plan plan2){
 		boolean value = false;
-		if (plan1.getExpectedCost() > plan2.getExpectedCost() + MARGIN[0] ||
+		if (plan1.getExpectedCost() < plan2.getExpectedCost() + MARGIN[0] ||
 				plan1.getExpectedNPV() > plan2.getExpectedNPV() + MARGIN[1] ||
 				plan1.getInvestmentRisk() < plan2.getInvestmentRisk() + MARGIN[2]){
 			value = true;

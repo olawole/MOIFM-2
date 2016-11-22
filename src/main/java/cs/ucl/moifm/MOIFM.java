@@ -19,8 +19,8 @@ import com.orsoncharts.Chart3D;
 import com.orsoncharts.Chart3DPanel;
 import com.orsoncharts.data.xyz.XYZDataset;
 
-import cs.ucl.moifm.model.MMF;
-import cs.ucl.moifm.model.MMFException;
+import cs.ucl.moifm.model.Feature;
+import cs.ucl.moifm.model.FeatureException;
 import cs.ucl.moifm.model.Plan;
 import cs.ucl.moifm.model.Project;
 import cs.ucl.moifm.util.Curve;
@@ -52,9 +52,9 @@ public class MOIFM {
 	 * @return a Project object storing the features, cash values and
 	 * relationships
 	 * @throws IOException throws exception when file not found
-	 * @throws MMFException throws exception for invalid feature id
+	 * @throws FeatureException throws exception for invalid feature id
 	 */
-	public static Project parseModel(String cashFlowPath, String precedencePath, double interestRate) throws IOException, MMFException{
+	public static Project parseModel(String cashFlowPath, String precedencePath, double interestRate) throws IOException, FeatureException{
 		Project project = new Project();
 		CSVReader reader = new CSVReader(new FileReader(cashFlowPath));
 		ModelParser.fileToModelParser(reader, project);
@@ -67,12 +67,12 @@ public class MOIFM {
 	/**
 	 * run Monte Carlo Simulation to generate cash flow scenarios
 	 * @param project reference to the current project
+	 * @throws FeatureException 
 	 * 
 	 */
 	
-	public static void simulate_cf(Project project){
-		MCSimulation.simulate(project);
-		MCSimulation.simulate_sanpv(project.getSimCashflow(), project);
+	public static void simulate_cf() throws FeatureException{
+		MCSimulation.simulate();
 	}
 	
 	/**
@@ -82,8 +82,8 @@ public class MOIFM {
 	 * @return a population of length {@literal size}
 	 */
 	
-	public static Population generateRandomPlan(int size, Project project){
-		Population randPopulation = new Population(size, project, true);
+	public static Population generateRandomPlan(int size){
+		Population randPopulation = new Population(size, true);
 		return randPopulation;
 	}
 	
@@ -145,11 +145,11 @@ public class MOIFM {
 	 * @param project reference to the project
 	 * @return cash flow analysis table
 	 */
-	public static Double[][] planCashAnalysis(Plan plan, Project project){
-		return plan.cashFlowAnalysis(plan.transformPlan(), project);
+	public static Double[][] planCashAnalysis(Plan plan){
+		return plan.cashFlowAnalysis(plan.transformPlan());
 	}
 	
-	public static HashMap<String,Double[][]> CashAnalysis(List<Plan> plans, Project project){
+	public static HashMap<String,Double[][]> CashAnalysis(List<Plan> plans){
 		HashMap<String, Double[][]> analysis = new HashMap<String, Double[][]>();
 		Double[][] data;
 		String label;
@@ -158,7 +158,7 @@ public class MOIFM {
 			if (++count > 10){
 				break;
 			}
-			data = plan.cashFlowAnalysis(plan.transformPlan(), project);
+			data = plan.cashFlowAnalysis(plan.transformPlan());
 			label = plan.transformPlan().toString();
 			if (!analysis.containsKey(label))
 				analysis.put(label, data);
@@ -172,9 +172,9 @@ public class MOIFM {
 	 * @param project reference to the project
 	 * @throws Exception 
 	 */
-	public static void analyisCurve(Double[][] cfa, Project project,String name) throws Exception{
-		int[] xdata = IntStream.rangeClosed(1, project.getPeriods()).toArray();
-		Double[] ydata = cfa[project.getFeatures().size()+1];
+	public static void analyisCurve(Double[][] cfa, String name) throws Exception{
+		int[] xdata = IntStream.rangeClosed(1, Project.getPeriods()).toArray();
+		Double[] ydata = cfa[Project.getFeatures().size()+1];
 		final Curve curve = new Curve("Cash Flow Analysis", xdata, ydata,name);
 	    curve.pack();
 	    RefineryUtilities.centerFrameOnScreen(curve);
@@ -221,10 +221,10 @@ public class MOIFM {
 	 * Generates precedence graph for the project
 	 * @param project
 	 */
-	public static void precedenceGraph(Project project){
-		List<MMF> m = new ArrayList<MMF>();
-		for (String id : project.getMmfs().keySet()){
-			m.add(project.getMmfs().get(id));
+	public static void precedenceGraph(){
+		List<Feature> m = new ArrayList<Feature>();
+		for (String id : Project.getMmfs().keySet()){
+			m.add(Project.getMmfs().get(id));
 		}
 		PrecedenceGraph applet = new PrecedenceGraph(m);
         applet.init();

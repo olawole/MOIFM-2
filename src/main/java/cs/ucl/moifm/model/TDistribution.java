@@ -1,11 +1,18 @@
 package cs.ucl.moifm.model;
 
+import org.apache.commons.math3.distribution.TriangularDistribution;
+
 
 /*
  * Describes a triangular distribution for the cash elements.
  */
-public class TDistribution {
+public class TDistribution extends TriangularDistribution {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	/*
 	 * least is the minimum value of the cash element
 	 */
@@ -16,29 +23,16 @@ public class TDistribution {
 	 */
 	private double most;
 	
-	/*
-	 * mode is the most likely value of the cash element
-	 */
-	private double mode;
 	
 	public TDistribution(double least, double most, double mode){
+		super(least, mode, most);
 		this.setLeast(least);
 		this.setMost(most);
-		this.setMode(mode);
 	}
 	
-	public TDistribution(){
-		this.setLeast(0);
-		this.setMost(0);
-		this.setMode(0);
-	}
 
 	public double getMode() {
-		return mode;
-	}
-
-	public void setMode(double mode) {
-		this.mode = mode;
+		return super.getMode();
 	}
 
 	public double getMost() {

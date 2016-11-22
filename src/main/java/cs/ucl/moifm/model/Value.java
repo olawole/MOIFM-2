@@ -15,11 +15,16 @@ public class Value {
 	
 	private double[][] value_sim;
 	
+	private double[] avg_value;
+	
+	
 	public Value (double value, double growthRate, double sdGrowth){
 		this.valDistribution = new NormalDistribution();
 		initial_value = value;
 		growth_rate = growthRate;
 	}
+	
+	public Value(){}
 	
 	public double valueGrowth(int period){
 		if (period < 1){
@@ -55,5 +60,13 @@ public class Value {
 
 	public void setValue_sim(double[][] value_sim) {
 		this.value_sim = value_sim;
+	}
+
+	public double[] getAvg_value() {
+		return avg_value;
+	}
+
+	public void setAvg_value(double[] avg_value) {
+		this.avg_value = avg_value;
 	}
 }

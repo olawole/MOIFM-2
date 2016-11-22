@@ -53,7 +53,7 @@ import org.jgrapht.graph.*;
 // resolve ambiguity
 import org.jgrapht.graph.DefaultEdge;
 
-import cs.ucl.moifm.model.MMF;
+import cs.ucl.moifm.model.Feature;
 
 
 /**
@@ -68,12 +68,12 @@ public class PrecedenceGraph
     private static final long serialVersionUID = 3256444702936019250L;
     private static final Color DEFAULT_BG_COLOR = Color.decode("#FAFBFF");
     private static final Dimension DEFAULT_SIZE = new Dimension(700, 400);
-    private List<MMF> features;
+    private List<Feature> features;
 
     //
     private JGraphModelAdapter<String, DefaultEdge> jgAdapter;
 
-    public PrecedenceGraph(List<MMF> mmfs){
+    public PrecedenceGraph(List<Feature> mmfs){
     	features = mmfs;
     }
     
@@ -115,9 +115,9 @@ public class PrecedenceGraph
         getContentPane().add(jgraph);
         resize(DEFAULT_SIZE);
         HashMap<String, String> mapping = new HashMap<String, String>();
-        for (MMF mmf : features){
+        for (Feature mmf : features){
         	String value = "";
-        	for (MMF prec : mmf.getPrecursors()){
+        	for (Feature prec : mmf.getPrecursors()){
         		if (value == ""){
         			value += prec.getId();
         		}

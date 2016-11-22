@@ -6,17 +6,17 @@ import java.util.List;
 
 import com.opencsv.CSVReader;
 
-import cs.ucl.moifm.model.MMF;
-import cs.ucl.moifm.model.MMFException;
+import cs.ucl.moifm.model.Feature;
+import cs.ucl.moifm.model.FeatureException;
 import cs.ucl.moifm.model.Project;
 
 public class ModelParser {
 	
-	public static void fileToModelParser (CSVReader reader, Project project) throws IOException, MMFException{
+	public static void fileToModelParser (CSVReader reader, Project project) throws IOException, FeatureException{
 		String [] nextLine;
 
 	    while ((nextLine = reader.readNext()) != null) {
-	    	MMF mmf = new MMF("");
+	    	Feature mmf = new Feature("");
 	    	List<Double> cashvalue = new ArrayList<Double>();
 	        // nextLine[] is an array of values from the line
 	    	for (int i = 0; i < nextLine.length; i++){
@@ -33,22 +33,22 @@ public class ModelParser {
 	    	mmf.setCashFlow(cashvalue);
 	    	mmf.setCashValue(cashvalue);
 	    	mmf.setDevPeriod();
-	    	project.add(mmf);
-	    	project.setPeriods(cashvalue.size());
+	    	Project.add(mmf);
+	    	Project.setPeriods(cashvalue.size());
 	     }
-	    project.setFeatures();
+	    Project.setFeatures();
 	  
 	  
 	}
 	
-	public static void convertFileToPrecedence(CSVReader predReader, Project project) throws IOException, MMFException{
+	public static void convertFileToPrecedence(CSVReader predReader, Project project) throws IOException, FeatureException{
 		String[] nextLine;
 		
 		while ((nextLine = predReader.readNext()) != null){
-			if (project.getMmfs().containsKey(nextLine[0]))
-				project.getMmfs().get(nextLine[0]).addPrecursor(project.getMmfs().get(nextLine[1]));
+			if (Project.getMmfs().containsKey(nextLine[0]))
+				Project.getMmfs().get(nextLine[0]).addPrecursor(Project.getMmfs().get(nextLine[1]));
 		}
 		
-		project.setStrands();
+		Project.setStrands();
 	}
 }

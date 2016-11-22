@@ -13,14 +13,14 @@ import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MMF {
-	public static final String EVENT_ID = "mmf.id";
-	public static final String EVENT_NAME = "mmf.name";
-	public static final String EVENT_NUMBER_OF_DEVELOPMENT_PERIOD = "mmf.devPeriod";
-	public static final String EVENT_PRECURSORS = "mmf.precursors";
-	public static final String EVENT_STRAND = "mmf.strand";
-	public static final String EVENT_CASHFLOW = "mmf.cashflow";
-	public static final String EVENT_PROJECT = "mmf.project";
+public class Feature {
+//	public static final String EVENT_ID = "mmf.id";
+//	public static final String EVENT_NAME = "mmf.name";
+//	public static final String EVENT_NUMBER_OF_DEVELOPMENT_PERIOD = "mmf.devPeriod";
+//	public static final String EVENT_PRECURSORS = "mmf.precursors";
+//	public static final String EVENT_STRAND = "mmf.strand";
+//	public static final String EVENT_CASHFLOW = "mmf.cashflow";
+//	public static final String EVENT_PROJECT = "mmf.project";
 	
 	/**
      * The unique ID of the MMF. This is used to identify the MMF and displayed
@@ -48,6 +48,11 @@ public class MMF {
     private int devPeriod;
     
     /**
+     * A feature can be a marketable feature (MMF) or an architectural element
+     */
+    private String type;
+    
+    /**
      * The view is divided into several strands from top to bottom. This
      * parameter tells which strand the MMF will be drawn in.
      * 
@@ -59,14 +64,14 @@ public class MMF {
      * before this MMF. Usually the MMF is positioned in a
      * period after all precursors are completed.
      */
-    private List<MMF> precursors;
+    private List<Feature> precursors;
     
     /**
      * ArrayList of integers representing the cashflow for each period.
      */
-    private List<Double> cashflow;
+    private Cost costDistribution;
     
-    private List<TDistribution> cashvalue;
+    private Value valueDistribution;
     
     /**
      * The project this MMF belongs to.
@@ -79,13 +84,21 @@ public class MMF {
      * @param id
      * @param name
      */
-    public MMF(String id) {
+    public Feature(String id, String type) {
         this.id = id;
+        this.type = type;
         this.name = "";
         this.devPeriod = 1;
-        this.precursors = new ArrayList<MMF>();
-        this.cashflow = new ArrayList<Double>();
-        this.cashvalue = new ArrayList<TDistribution>();
+        this.precursors = new ArrayList<Feature>();
+        this.setCostDistribution(new Cost());
+        if (type == "MMF"){
+        	this.setValueDistribution(new Value());
+        }
+        else {
+        	this.setValueDistribution(null);
+        }
+        
+        
     }
     
     /**
@@ -93,7 +106,7 @@ public class MMF {
      */
     @Override
     public String toString() {
-        return "MMF " + id + ": " + name + " [" + devPeriod + "," + strand
+        return type + id + ": " + name + " [" + devPeriod + "," + strand
                 + "] > " + precursors;
     }
     
@@ -108,9 +121,9 @@ public class MMF {
      * @param id
      * @throws MmfException
      */
-    public void setId(String id) throws MMFException {
+    public void setId(String id) throws FeatureException {
         if ((null != project) && !project.isValidId(id)) {
-            throw new MMFException("The id is not valid or has a duplicate: "
+            throw new FeatureException("The id is not valid or has a duplicate: "
                     + id);
         }
         this.id = id;
@@ -139,28 +152,28 @@ public class MMF {
      * 
      * @throws MmfException
      */
-    public void setDevPeriod() throws MMFException {
-     /*   if (period < 1) {
-            throw new MMFException("Invalid period: " + period);
-        }
-        if (period == this.devPeriod) {
-            return;
-        }
-
-         */
-    	int period = 0;
-    	if (this.cashflow == null){
-    		throw new MMFException("No cash flow for the specified MMF");
-    	}
-    	else {
-    		for (Double cash : this.cashflow){
-    			if (cash < 0) ++period;
-    		}
-            this.devPeriod = period;
-    	}
-    }
+//    public void setDevPeriod() throws FeatureException {
+//     /*   if (period < 1) {
+//            throw new MMFException("Invalid period: " + period);
+//        }
+//        if (period == this.devPeriod) {
+//            return;
+//        }
+//
+//         */
+//    	int period = 0;
+//    	if (this.cashflow == null){
+//    		throw new FeatureException("No cash flow for the specified MMF");
+//    	}
+//    	else {
+//    		for (Double cash : this.cashflow){
+//    			if (cash < 0) ++period;
+//    		}
+//            this.devPeriod = period;
+//    	}
+//    }
     
-    public List<MMF> getPrecursors() {
+    public List<Feature> getPrecursors() {
         return Collections.unmodifiableList(precursors);
     }
     
@@ -172,7 +185,7 @@ public class MMF {
             return "";
         } else {
             String result = "";
-            for (MMF mmfPre : precursors) {
+            for (Feature mmfPre : precursors) {
                 result += ", " + mmfPre.getId();
             }
             return result.substring(2);
@@ -184,15 +197,15 @@ public class MMF {
      * 
      * @param prestring
      */
-    public void setPrecursorString(String prestring) throws MMFException {
-        List<MMF> newPrecursors = new ArrayList<MMF>();
+    public void setPrecursorString(String prestring) throws FeatureException {
+        List<Feature> newPrecursors = new ArrayList<Feature>();
 
         Pattern pattern = Pattern.compile("Z*[A-Y]");
         Matcher matcher = pattern.matcher(prestring.toUpperCase());
 
         // check validity of all new precursors
         while (matcher.find()) {
-            MMF preMmf = project.get(matcher.group());
+            Feature preMmf = project.get(matcher.group());
             if (newPrecursors.contains(preMmf)) {
                 continue;
             }
@@ -211,7 +224,7 @@ public class MMF {
      * @param precursor
      * @throws MmfException
      */
-    public void addPrecursor(MMF precursor) throws MMFException {
+    public void addPrecursor(Feature precursor) throws FeatureException {
         if (this.precursors.indexOf(precursor) < 0) {
             checkValidPrecursor(precursor);
             this.precursors.add(precursor);
@@ -235,18 +248,18 @@ public class MMF {
      * @param precursor
      * @throws MmfException
      */
-    private void checkValidPrecursor(MMF precursor) throws MMFException {
+    private void checkValidPrecursor(Feature precursor) throws FeatureException {
         if (null == precursor) {
-            throw new MMFException("Precursor does not exist");
+            throw new FeatureException("Precursor does not exist");
         } else if (this.getProject() != precursor.getProject()) {
-            throw new MMFException(
+            throw new FeatureException(
                     "Precursor is not a part of the same project");
         } else if (this == precursor) {
-            throw new MMFException(
+            throw new FeatureException(
                     "MMF can not be a precursor to itself (circular precedence)");
         }
-        List<MMF> prePre = precursor.getPrecursors();
-        for (MMF pre : prePre) {
+        List<Feature> prePre = precursor.getPrecursors();
+        for (Feature pre : prePre) {
             checkValidPrecursor(pre);
         }
     }
@@ -256,53 +269,14 @@ public class MMF {
      * 
      * @param precursor
      */
-    public void removePrecursor(MMF precursor) {
+    public void removePrecursor(Feature precursor) {
         if (this.precursors.indexOf(precursor) >= 0) {
             this.precursors.remove(precursor);
         }
     }
     
-    public List<Double> getCashFlow(){
-    	return cashflow;
-    }
-    
-    public void setCashFlow(List<Double> cash){
-    	this.cashflow = cash;
-    }
-    public List<TDistribution> getCashvalue() {
-		if (cashvalue == null)
-			setCashValue(cashflow);
-    	return cashvalue;
-	}
 
-	public void setCashValue(List<Double> cash) {
-		int i = 0;
-		List<TDistribution> cashvalue = new ArrayList<TDistribution>();
-		
-		
-		for (Double value : cash){
-			TDistribution buffer = new TDistribution();
-			if (value > 0){
-				buffer.setLeast(0.0);
-				buffer.setMost(1.2 * value);
-				buffer.setMode(value);
-				cashvalue.add(i++, buffer);
-			}
-			else if (value == 0){
-				buffer.setLeast(0.0);
-				buffer.setMost(value + 0.001);
-				buffer.setMode(value + 0.0005);
-				cashvalue.add(i++, buffer);
-			}
-			else {
-				buffer.setLeast(value);
-				buffer.setMost(1.5 * value);
-				buffer.setMode(1.2 * value);
-				cashvalue.add(i++, buffer);
-			}
-		}
-		this.cashvalue = cashvalue;
-	}
+	
 
 	/**
      * Sets the revenue for the given period. Can be both positive and negative,
@@ -313,23 +287,23 @@ public class MMF {
      * @param revenue
      *            value of revenue in this period
      */
-    public void setRevenue(int period, int revenue) {
-        while (period > cashflow.size()) {
-            cashflow.add((double) 0);
-        }
-        this.cashflow.set(period - 1, (double) revenue);
-    }
-    
-    public Double getRevenue(int period) {
-        if (period > cashflow.size()) {
-            return (double) 0;
-        }
-        return cashflow.get(period - 1);
-    }
-    
-    public int getRevenueLength() {
-        return cashflow.size();
-    }
+//    public void setRevenue(int period, int revenue) {
+//        while (period > cashflow.size()) {
+//            cashflow.add((double) 0);
+//        }
+//        this.cashflow.set(period - 1, (double) revenue);
+//    }
+//    
+//    public Double getRevenue(int period) {
+//        if (period > cashflow.size()) {
+//            return (double) 0;
+//        }
+//        return cashflow.get(period - 1);
+//    }
+//    
+//    public int getRevenueLength() {
+//        return cashflow.size();
+//    }
     
     public Project getProject() {
         return project;
@@ -350,14 +324,14 @@ public class MMF {
      * 
      * @param interestRate
      */
-    public Double[] getSaNpvList(double interestRate) {
-        int periods = project.getPeriods();
-        Double sanpv[] = new Double[periods];
-        for (int p = 0; p < periods; p++) {
-            sanpv[p] = getSaNpv(interestRate, p);
-        }
-        return sanpv;
-    }
+//    public Double[] getSaNpvList(double interestRate) {
+//        int periods = project.getPeriods();
+//        Double sanpv[] = new Double[periods];
+//        for (int p = 0; p < periods; p++) {
+//            sanpv[p] = getSaNpv(interestRate, p);
+//        }
+//        return sanpv;
+//    }
 
     /**
      * Returns the SANPV for the given start period and interest rate.
@@ -366,32 +340,32 @@ public class MMF {
      * @param skipPeriods
      * @throws MmfException
      */
-    public double getSaNpv(double interestRate, int skipPeriods) {
-        if (skipPeriods < 0) {
-            throw new IllegalArgumentException("Invalid startPeriod: "
-                    + skipPeriods);
-        }
-
-        double npv = 0.0F;
-        for (int p = 1; p <= project.getPeriods() - skipPeriods; p++) {
-            Double rev = getRevenue(p);
-            int per = (skipPeriods + p);
-            npv += rev / Math.pow(interestRate + 1, per);
-        }
-        return npv;
-    }
-    
-    public double getDiscountedValue(double interestRate, int period){
-    	if (period < 1 || period >= project.getPeriods()) {
-            throw new IllegalArgumentException("Invalid startPeriod: "
-                    + period);
-        }
-    	
-    	double discountValue = 0.0;
-    	discountValue = getRevenue(period) / Math.pow(interestRate + 1, period);
-    	
-    	return discountValue;
-    }
+//    public double getSaNpv(double interestRate, int skipPeriods) {
+//        if (skipPeriods < 0) {
+//            throw new IllegalArgumentException("Invalid startPeriod: "
+//                    + skipPeriods);
+//        }
+//
+//        double npv = 0.0F;
+//        for (int p = 1; p <= project.getPeriods() - skipPeriods; p++) {
+//            Double rev = getRevenue(p);
+//            int per = (skipPeriods + p);
+//            npv += rev / Math.pow(interestRate + 1, per);
+//        }
+//        return npv;
+//    }
+//    
+//    public double getDiscountedValue(double interestRate, int period){
+//    	if (period < 1 || period >= project.getPeriods()) {
+//            throw new IllegalArgumentException("Invalid startPeriod: "
+//                    + period);
+//        }
+//    	
+//    	double discountValue = 0.0;
+//    	discountValue = getRevenue(period) / Math.pow(interestRate + 1, period);
+//    	
+//    	return discountValue;
+//    }
     
     public int getStrand(){
     	return this.strand;
@@ -400,6 +374,22 @@ public class MMF {
     public void setStrand(int strand){
     	this.strand = strand;
     }
+
+	public Cost getCostDistribution() {
+		return costDistribution;
+	}
+
+	public void setCostDistribution(Cost costDistribution) {
+		this.costDistribution = costDistribution;
+	}
+
+	public Value getValueDistribution() {
+		return valueDistribution;
+	}
+
+	public void setValueDistribution(Value valueDistribution) {
+		this.valueDistribution = valueDistribution;
+	}
     
     
     

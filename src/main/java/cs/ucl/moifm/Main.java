@@ -8,7 +8,7 @@ import com.orsoncharts.Chart3D;
 import com.orsoncharts.Chart3DPanel;
 import com.orsoncharts.data.xyz.XYZDataset;
 
-import cs.ucl.moifm.model.MMF;
+import cs.ucl.moifm.model.Feature;
 import cs.ucl.moifm.model.Project;
 import cs.ucl.moifm.util.Front;
 import cs.ucl.moifm.util.Genetic;
@@ -45,7 +45,7 @@ public class Main {
 			Project project = new Project();
 			ModelParser.fileToModelParser(reader, project);
 			ModelParser.convertFileToPrecedence(precedenceReader, project);
-			List<MMF> m = new ArrayList<MMF>();
+			List<Feature> m = new ArrayList<Feature>();
 			for (String id : project.getMmfs().keySet()){
 				m.add(project.getMmfs().get(id));
 			}
