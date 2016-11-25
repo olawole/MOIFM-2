@@ -24,7 +24,7 @@ public class TDistribution extends TriangularDistribution {
 	private double most;
 	
 	
-	public TDistribution(double least, double most, double mode){
+	public TDistribution(double least, double mode, double most){
 		super(least, mode, most);
 		this.setLeast(least);
 		this.setMost(most);

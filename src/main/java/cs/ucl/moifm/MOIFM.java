@@ -1,11 +1,11 @@
 package cs.ucl.moifm;
 
 
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -14,7 +14,6 @@ import javax.swing.WindowConstants;
 
 import org.jfree.ui.RefineryUtilities;
 
-import com.opencsv.CSVReader;
 import com.orsoncharts.Chart3D;
 import com.orsoncharts.Chart3DPanel;
 import com.orsoncharts.data.xyz.XYZDataset;
@@ -27,7 +26,6 @@ import cs.ucl.moifm.util.Curve;
 import cs.ucl.moifm.util.Front;
 import cs.ucl.moifm.util.Genetic;
 import cs.ucl.moifm.util.MCSimulation;
-import cs.ucl.moifm.util.ModelParser;
 import cs.ucl.moifm.util.Plot3D;
 import cs.ucl.moifm.util.Population;
 import cs.ucl.moifm.util.PrecedenceGraph;
@@ -54,15 +52,16 @@ public class MOIFM {
 	 * @throws IOException throws exception when file not found
 	 * @throws FeatureException throws exception for invalid feature id
 	 */
-	public static Project parseModel(String cashFlowPath, String precedencePath, double interestRate) throws IOException, FeatureException{
-		Project project = new Project();
-		CSVReader reader = new CSVReader(new FileReader(cashFlowPath));
-		ModelParser.fileToModelParser(reader, project);
-		reader = new CSVReader(new FileReader(precedencePath));
-		ModelParser.convertFileToPrecedence(reader, project);
-		reader.close();
-		return project;
-	}
+//	public static void parseModel(String featurePath, String precedencePath, String valuePath) throws IOException, FeatureException{
+//		CSVReader reader = new CSVReader(new FileReader(featurePath));
+//		Project.readFeatures(reader);
+//		reader = new CSVReader(new FileReader(precedencePath));
+//		Project.convertFileToPrecedence(reader);
+//		reader = new CSVReader(new FileReader(valuePath));
+//		Project.readValues(reader);
+//		reader.close();
+//		
+//	}
 	
 	/**
 	 * run Monte Carlo Simulation to generate cash flow scenarios
@@ -71,10 +70,13 @@ public class MOIFM {
 	 * 
 	 */
 	
-	public static void simulate_cf() throws FeatureException{
-		MCSimulation.simulate();
+	public static void simulate_cf(LinkedHashMap<String, Feature> myFeatures, int period, double intRate) throws FeatureException{
+		MCSimulation.simulate(myFeatures, period, intRate);
 	}
 	
+	public static HashMap<String, Double[][]> calculateSanpv(LinkedHashMap<String, Feature> myFeatures, int period, double intRate) throws FeatureException{
+		return MCSimulation.calculate_sanpv(myFeatures, period, intRate);
+	}
 	/**
 	 * Generates random assignment of features to iterations or periods
 	 * @param size Number of solutions to be generated per generation
@@ -82,8 +84,8 @@ public class MOIFM {
 	 * @return a population of length {@literal size}
 	 */
 	
-	public static Population generateRandomPlan(int size){
-		Population randPopulation = new Population(size, true);
+	public static Population generateRandomPlan(Project project, int size){
+		Population randPopulation = new Population(project, size, true);
 		return randPopulation;
 	}
 	
@@ -95,11 +97,11 @@ public class MOIFM {
 	 * algorithm
 	 * @return final population after the termination of the search
 	 */
-	public static Population evolvePopulation(Population initial, int noOfGeneration){
+	public static Population evolvePopulation(Project project, Population initial, int noOfGeneration){
 		Population pop = initial;
 		for (int i = 0; i < noOfGeneration; i++){
 			 System.out.println("Generation " + (i+1));
-			 pop = Genetic.evolvePopulation(pop);
+			 pop = Genetic.evolvePopulation(project, pop);
 		}
 		
 		return pop;
@@ -172,9 +174,9 @@ public class MOIFM {
 	 * @param project reference to the project
 	 * @throws Exception 
 	 */
-	public static void analyisCurve(Double[][] cfa, String name) throws Exception{
-		int[] xdata = IntStream.rangeClosed(1, Project.getPeriods()).toArray();
-		Double[] ydata = cfa[Project.getFeatures().size()+1];
+	public static void analyisCurve(LinkedHashMap<String, Feature> myFeatures, int period,Double[][] cfa, String name) throws Exception{
+		int[] xdata = IntStream.rangeClosed(1, period).toArray();
+		Double[] ydata = cfa[myFeatures.size()+1];
 		final Curve curve = new Curve("Cash Flow Analysis", xdata, ydata,name);
 	    curve.pack();
 	    RefineryUtilities.centerFrameOnScreen(curve);
@@ -221,10 +223,10 @@ public class MOIFM {
 	 * Generates precedence graph for the project
 	 * @param project
 	 */
-	public static void precedenceGraph(){
+	public static void precedenceGraph(LinkedHashMap<String, Feature> myFeatures){
 		List<Feature> m = new ArrayList<Feature>();
-		for (String id : Project.getMmfs().keySet()){
-			m.add(Project.getMmfs().get(id));
+		for (String id : myFeatures.keySet()){
+			m.add(myFeatures.get(id));
 		}
 		PrecedenceGraph applet = new PrecedenceGraph(m);
         applet.init();

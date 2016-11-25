@@ -17,7 +17,7 @@ public class Cost {
 		this.setCost_amount(amount);
 		this.setIndus_over_estimation(over);
 		this.setIndus_under_estimation(under);
-		setDistribution(new TDistribution(cost_amount * indus_over_estimation, cost_amount * indus_over_estimation, cost_amount));
+		setDistribution(new TDistribution(cost_amount,cost_amount * indus_under_estimation, cost_amount * indus_over_estimation));
 	}
 	
 	public Cost(){}

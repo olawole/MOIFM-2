@@ -18,10 +18,11 @@ public class Value {
 	private double[] avg_value;
 	
 	
-	public Value (double value, double growthRate, double sdGrowth){
+	public Value (double value, double growthRate, int period){
 		this.valDistribution = new NormalDistribution();
 		initial_value = value;
 		growth_rate = growthRate;
+		valueDistribution(period);
 	}
 	
 	public Value(){}
@@ -30,7 +31,7 @@ public class Value {
 		if (period < 1){
 			return initial_value;
 		}
-		double period_rate = growth_rate * valDistribution.sample();
+		double period_rate = growth_rate * Math.abs(valDistribution.sample());
 		double periodValue;
 		periodValue = initial_value * Math.pow(1 + period_rate / 100, period);
 		return periodValue;
@@ -42,7 +43,7 @@ public class Value {
 		for (int i = 0; i < no_period; i++){
 			mode = valueGrowth(i);
 			most = mode * AVERAGE_UNDER_ESTIMATION;
-			value[i] = new TDistribution(least, most, mode);
+			value[i] = new TDistribution(least, mode, most);
 		}
 	}
 

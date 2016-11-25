@@ -14,7 +14,6 @@ public class Population {
 	public static List<String> invalid = new ArrayList<String>();
 	public static Double[] MARGIN = new Double[]{0.0, 0.0, 0.0};
 	
-	
 	/*
 	 * Generate initial population for the Genetic process
 	 * 
@@ -22,20 +21,25 @@ public class Population {
 	 *  @param proj
 	 *  @param initialize
 	 */
-	public Population(int populationSize, boolean initialize){
+	public Population(Project proj,int populationSize, boolean initialize){
 		plans = new ArrayList<Plan>(populationSize);
 	//	Population.archive = new ArrayList<String>();
 		
 		if (initialize){
 			int counter = 0;
 			while (counter < populationSize){
-				Plan newPlan = new Plan(Project.getFeatures().size());
+				Plan newPlan = new Plan(proj, proj.getFeatures().size());
 				do{
 					newPlan.generatePlan();
 				} while (!(newPlan.isValidPlan()) || Population.archive.contains(newPlan.toString()));
-				newPlan.evaluateFitness();
-				savePlan(counter++, newPlan);
-				Population.archive.add(newPlan.toString());
+				if(newPlan.evaluateFitness()){
+					savePlan(counter++, newPlan);
+					Population.archive.add(newPlan.toString());
+				}
+				else {
+					Population.invalid.add(newPlan.toString());
+				}
+				
 			}
 		}
 	}

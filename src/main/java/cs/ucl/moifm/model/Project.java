@@ -1,5 +1,8 @@
 package cs.ucl.moifm.model;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,55 +12,72 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.opencsv.CSVReader;
+
 
 public class Project{
 	
-
-    private static String name;
-    private static int periods;
-    private static double interestRate;
-    private static LinkedHashMap<String, Feature> myFeatures;
-    private static List<String> features;
-    private static HashMap<String, Double[]> sanpv;
-  //  private static HashMap<String, Double[][]> simCashflow;
-    private static HashMap<String, Double[][]> simSanpv;
-    private static HashMap<String, Double[]> simAverage;
-    private static String nextId;
-    private static int maxMmfsPerPeriod;
-    private static List<String> strands;
-    public static int nOfSim;
+    private  String name;
+    private  int periods;
+    private  double interestRate;
+    private  LinkedHashMap<String, Feature> myFeatures;
+    private  List<String> features;
+    private  HashMap<String, Double[]> sanpv;
+  //  private  HashMap<String, Double[][]> simCashflow;
+    private  HashMap<String, Double[][]> simSanpv;
+    private  HashMap<String, Double[]> simAverage;
+   // private  String nextId;
+    private  int maxMmfsPerPeriod;
+    private  List<String> strands;
+    public  int nOfSim;
     
-    private static double budgetConstraint;
+    private  double budgetConstraint;
     
     /**
      * Creates a new IFM Project with default values for all properties.
      */
-    public Project() {
-        Project.name = "New MMF Project";
-        Project.periods = 12;
-        Project.interestRate = 0.0241;
-        Project.nextId = "A";
-        Project.myFeatures = new LinkedHashMap<String, Feature>();
-        Project.maxMmfsPerPeriod = 1;
-        Project.budgetConstraint = 0.0;
-        Project.sanpv = new HashMap<String, Double[]>();
-        Project.nOfSim = 10000;
-        Project.strands = new ArrayList<String>();
-        Project.features = new ArrayList<String>();
+     public Project(){
+        this.name = "New MMF Project";
+        this.periods = 12;
+        this.interestRate = 0.0241;
+    //    this.nextId = "A";
+        this.myFeatures = new LinkedHashMap<String, Feature>();
+        this.maxMmfsPerPeriod = 1;
+        this.budgetConstraint = 0.0;
+        this.sanpv = new HashMap<String, Double[]>();
+        this.nOfSim = 10000;
+        this.strands = new ArrayList<String>();
+        this.features = new ArrayList<String>();
+    }
+     
+    public Project(String projName, int noOfPeriod, double intRate, String featurePath, String valuePath, String precPath) throws FileNotFoundException, IOException, FeatureException{
+    	 this.name = projName;
+         this.periods = noOfPeriod;
+         this.interestRate = intRate;
+         this.myFeatures = new LinkedHashMap<String, Feature>();
+         //this.maxMmfsPerPeriod = 1;
+        // this.budgetConstraint = 0.0;
+         this.sanpv = new HashMap<String, Double[]>();
+         this.nOfSim = 10000;
+         this.strands = new ArrayList<String>();
+         this.features = new ArrayList<String>();
+         readFeatures(new CSVReader(new FileReader(featurePath)));
+         readValues(new CSVReader(new FileReader(valuePath)));
+         convertFileToPrecedence(new CSVReader(new FileReader(precPath)));
     }
     
-    public static String getName() {
+    public  String getName() {
         return name;
     }
 
     /**
      * Sets the project name and fires the event EVENT_NAME.
      */
-    public static void setName(String name) {
-        Project.name = name;
+    public  void setName(String name) {
+        this.name = name;
     }
 
-    public static int getPeriods() {
+    public  int getPeriods() {
         return periods;
     }
     
@@ -69,14 +89,14 @@ public class Project{
      *
      * @throws MmfException
      */
-    public static void setPeriods(int periods) throws FeatureException {
+    public  void setPeriods(int periods) throws FeatureException {
         if ((periods < 1) || (periods > 105)) {
             throw new FeatureException("Invalid number of periods: " + periods);
         }
-        Project.periods = periods;
+        this.periods = periods;
     }
 
-    public static double getInterestRate() {
+    public  double getInterestRate() {
         return interestRate;
     }
     
@@ -85,14 +105,14 @@ public class Project{
      * EVENT_INTEREST_RATE. The value should be absolute, not in percent. (i.e.
      * 12% = 0.12)
      */
-    public static void setInterestRate(double interestRate) {
-        Project.interestRate = interestRate;
+    public  void setInterestRate(double interestRate) {
+        this.interestRate = interestRate;
     }
     
     /**
      * @return the maxMMFsPerPeriod
      */
-    public static int getMaxMmfsPerPeriod() {
+    public  int getMaxMmfsPerPeriod() {
         return maxMmfsPerPeriod;
 
     }
@@ -101,12 +121,12 @@ public class Project{
      * @param maxMmfsPerPeriod the maxMMFsPerPeriod to set
      * @throws MmfException
      */
-    public static void setMaxMmfsPerPeriod(int maxMmfsPerPeriod) throws FeatureException {
+    public  void setMaxMmfsPerPeriod(int maxMmfsPerPeriod) throws FeatureException {
         if (maxMmfsPerPeriod < 0) {
             throw new FeatureException("Invalid maxMMFsPerPeriod: "
                     + maxMmfsPerPeriod);
         }
-        Project.maxMmfsPerPeriod = maxMmfsPerPeriod;
+        this.maxMmfsPerPeriod = maxMmfsPerPeriod;
     }
     
     /**
@@ -115,28 +135,28 @@ public class Project{
      * If the MMF contains an invalid or duplicate id it will be reassigned a
      * new id.
      */
-    public static void add(Feature mmf) {
+    public  void add(Feature mmf) {
         if (myFeatures.containsKey(mmf.getId())) {
             throw new IllegalArgumentException("This MMF already exists: "
                     + mmf);
         }
 
-        if (!isValidId(mmf.getId())) {
-            try {
-                mmf.setId(getNextId());
-            } catch (Exception e) {
-                // Should never happend so we rethrow as a RuntimeException
-                throw new IllegalArgumentException(
-                        "isValidId() != isValidId()", e);
-            }
-        }
+//        if (!isValidId(mmf.getId())) {
+//            try {
+//                mmf.setId(getNextId());
+//            } catch (Exception e) {
+//                // Should never happend so we rethrow as a RuntimeException
+//                throw new IllegalArgumentException(
+//                        "isValidId() != isValidId()", e);
+//            }
+//        }
    //     mmf.setProject(this);
         myFeatures.put(mmf.getId(), mmf);
     }
     
-    public static void setNextId(String nextId) {
-        Project.nextId = nextId;
-    }
+//    public  void setNextId(String nextId) {
+//        this.nextId = nextId;
+//    }
     
     /**
      * Checks if the given id is valid and has no duplicates in the current
@@ -144,7 +164,7 @@ public class Project{
      *
      * @return true of valid, false if not or a duplicate exists
      */
-    public static boolean isValidId(String id) {
+    public  boolean isValidId(String id) {
         return (null != id) && id.matches("Z*[A-Y]*[1-9]*") && (null == get(id));
     }
     
@@ -152,35 +172,35 @@ public class Project{
      * @return the id that should be used for the next MMF that is added. The
      *         value is not increased until the next MMF is actually added.
      */
-    public static String getNextId() {
-        // check if next id is correct.
-        while (!isValidId(nextId)) {
-            // find next id value
-            char nextChar = (char) (1 + nextId.charAt(nextId.length() - 1));
-            String pre = nextId.substring(0, nextId.length() - 1);
-            nextId = pre + nextChar;
-            if (nextChar == 'Z') {
-                // We're at the last usable character in this set. We retry all
-                // previous characters
-                // in an attempt to avoid multiple characters, otherwise we add
-                // another 'A' character
-                for (int i = 0; i < 25 * 10 + 1; i++) {
-                    nextId = "ZZZZZZZZZZ".substring(0, i / 25)
-                            + (char) ('A' + i % 25);
-                    if (isValidId(nextId)) {
-                        return nextId;
-                    }
-                }
-            }
-        }
-        return nextId;
-    }
+//    public  String getNextId() {
+//        // check if next id is correct.
+//        while (!isValidId(nextId)) {
+//            // find next id value
+//            char nextChar = (char) (1 + nextId.charAt(nextId.length() - 1));
+//            String pre = nextId.substring(0, nextId.length() - 1);
+//            nextId = pre + nextChar;
+//            if (nextChar == 'Z') {
+//                // We're at the last usable character in this set. We retry all
+//                // previous characters
+//                // in an attempt to avoid multiple characters, otherwise we add
+//                // another 'A' character
+//                for (int i = 0; i < 25 * 10 + 1; i++) {
+//                    nextId = "ZZZZZZZZZZ".substring(0, i / 25)
+//                            + (char) ('A' + i % 25);
+//                    if (isValidId(nextId)) {
+//                        return nextId;
+//                    }
+//                }
+//            }
+//        }
+//        return nextId;
+//    }
 
-    public static Feature get(int index) {
+    public  Feature get(int index) {
         return myFeatures.get(index);
     }
 
-    public static Feature get(String id) {
+    public  Feature get(String id) {
         
         return myFeatures.get(id);
     }
@@ -188,14 +208,14 @@ public class Project{
     /**
      * @return a unmodifiable copy of the mmf list
      */
-    public static LinkedHashMap<String, Feature> getMmfs() {
-        return Project.myFeatures;
+    public  LinkedHashMap<String, Feature> getMmfs() {
+        return this.myFeatures;
     }
     
     /**
      * Removes the mmf from the list of mmfs and fires the EVENT_MMFS event.
      */
-    public static void remove(Feature mmf) {
+    public  void remove(Feature mmf) {
         for (Entry<String, Feature> m : myFeatures.entrySet()) {
             if (m.getValue().getPrecursors().contains(mmf)) {
                 m.getValue().removePrecursor(mmf);
@@ -208,25 +228,25 @@ public class Project{
     /**
      * @return the number of MMFs in the project
      */
-    public static int size() {
+    public  int size() {
         return myFeatures.size();
     }
     
-	public static double getBudgetConstraint() {
+	public  double getBudgetConstraint() {
 		return budgetConstraint;
 	}
 
-	public static void setBudgetConstraint(double budgetConstraint) {
-		Project.budgetConstraint = budgetConstraint;
+	public  void setBudgetConstraint(double budgetConstraint) {
+		this.budgetConstraint = budgetConstraint;
 	}
 
-	public static HashMap<String, Double[]> getSanpv() {
+	public  HashMap<String, Double[]> getSanpv() {
 		return sanpv;
 	}
 
-//	public static void setSanpv() {
+//	public  void setSanpv() {
 //		for (Map.Entry<String, Feature> value : myFeatures.entrySet()){
-//			sanpv.put(value.getKey(), value.getValue().getSaNpvList(Project.interestRate));
+//			sanpv.put(value.getKey(), value.getValue().getSaNpvList(this.interestRate));
 //		}
 //		
 //	}
@@ -234,42 +254,42 @@ public class Project{
 	/**
 	 * @return the simCashflow
 	 */
-//	public static HashMap<String, Double[][]> getSimCashflow() {
+//	public  HashMap<String, Double[][]> getSimCashflow() {
 //		return simCashflow;
 //	}
 
 	/**
 	 * @param simCashflow the simCashflow to set
 	 */
-//	public static void setSimCashflow(HashMap<String, Double[][]> simCashflow) {
-//		Project.simCashflow = simCashflow;
+//	public  void setSimCashflow(HashMap<String, Double[][]> simCashflow) {
+//		this.simCashflow = simCashflow;
 //	}
 
 	/**
 	 * @return the simSanpv
 	 */
-	public static HashMap<String, Double[][]> getSimSanpv() {
+	public  HashMap<String, Double[][]> getSimSanpv() {
 		return simSanpv;
 	}
 
 	/**
 	 * @param simSanpv the simSanpv to set
 	 */
-	public static void setSimSanpv(HashMap<String, Double[][]> simSanpv) {
-		Project.simSanpv = simSanpv;
+	public  void setSimSanpv(HashMap<String, Double[][]> simSanpv) {
+		this.simSanpv = simSanpv;
 	}
 
 	/**
 	 * @return the strands
 	 */
-	public static List<String> getStrands() {
+	public  List<String> getStrands() {
 		return strands;
 	}
 
 	/**
 	 * @param strands the strands to set
 	 */
-//	public static void setStrands() {
+//	public  void setStrands() {
 //		Set<String> strand = myFeatures.keySet();
 //		Set<String> newStrand = new HashSet<String>(strand.size());
 //		Set<String> temp = new HashSet<String>(strand.size());
@@ -312,26 +332,70 @@ public class Project{
 	/**
 	 * @return the features
 	 */
-	public static List<String> getFeatures() {
+	public  List<String> getFeatures() {
 		return features;
 	}
 
 	/**
 	 * @param features the features to set
 	 */
-	public static void setFeatures() {
+	public  void setFeatures() {
 		for (String s : myFeatures.keySet()){
 			features.add(s);
 		}
 	}
 
-	public static HashMap<String, Double[]> getSimAverage() {
+	public  HashMap<String, Double[]> getSimAverage() {
 		return simAverage;
 	}
 
-	public static void setSimAverage(HashMap<String, Double[]> simAverage) {
-		Project.simAverage = simAverage;
+	public  void setSimAverage(HashMap<String, Double[]> simAverage) {
+		this.simAverage = simAverage;
 	}
 	
+	public  void readFeatures (CSVReader reader) throws IOException, FeatureException{
+		String [] nextLine;
+		reader.readNext();
+	    while ((nextLine = reader.readNext()) != null) {
+	    	String type = null, id = null;
+	    	Double cost;
+	    	String[] name = nextLine[0].split(" ");
+	    	type = name[0];
+	    	id = name[1];
+	    	Feature mmf = new Feature(id, type);
+	    	cost = Double.parseDouble(nextLine[1]);
+	//    	growth = Double.parseDouble(nextLine[2]);
+	    	Cost costD = new Cost(cost, 1.5, 1.2);
+	    	mmf.setCostDistribution(costD);
+	    	this.add(mmf);
+	 //   	this.setPeriods(cashvalue.size());
+	     }
+	    this.setFeatures();	  	  
+	}
+	
+	public void readValues (CSVReader reader) throws IOException, FeatureException{
+		String[] line;
+		reader.readNext();
+		while ((line = reader.readNext()) != null){
+			String id = line[0];
+			Double value = Double.parseDouble(line[1]);
+			Double growth = Double.parseDouble(line[2]);
+			Value valueD = new Value(value, growth, this.getPeriods());
+			if (this.getMmfs().get(id) != null){
+				this.getMmfs().get(id).setValueDistribution(valueD);
+			}
+		}
+	}
+	
+	public void convertFileToPrecedence(CSVReader predReader) throws IOException, FeatureException{
+		String[] nextLine;
+		
+		while ((nextLine = predReader.readNext()) != null){
+			if (this.getMmfs().containsKey(nextLine[0]))
+				this.getMmfs().get(nextLine[0]).addPrecursor(this.getMmfs().get(nextLine[1]));
+		}
+		
+	//	this.setStrands();
+	}
 
 }

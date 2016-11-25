@@ -391,7 +391,9 @@ public class Feature {
 		this.valueDistribution = valueDistribution;
 	}
     
-    
+    public String getType(){
+    	return this.type;
+    }
     
     
 }

@@ -19,11 +19,14 @@ public class Genetic {
 //	public static final int POPULATION_SIZE = 100;
 	public static List<Plan> allSolution = new ArrayList<Plan>();
 	
-	public static Population evolvePopulation(Population pop){
+	public static Project project;
+	
+	public static Population evolvePopulation(Project proj, Population pop){
 		if (pop.plans.size() < 1)
 			return null;
-		Population newPopulation = new Population(pop.plans.size(), false);
-		Population children = new Population(pop.plans.size(), false);
+		project = proj;
+		Population newPopulation = new Population(project, pop.plans.size(), false);
+		Population children = new Population(project, pop.plans.size(), false);
 		children = reproduce(pop);
 		newPopulation = selection(pop, children);
 		return newPopulation;
@@ -68,7 +71,7 @@ public class Genetic {
 
 	public static Plan crossover(Plan parent_1,
 			Plan parent_2) {
-		Plan child = new Plan(Project.getFeatures().size());
+		Plan child = new Plan(project, project.getFeatures().size());
 		int startPos, endPos;
 		do {
 			startPos = (int) (Math.random() * parent_1.getChromosome().size());
@@ -120,7 +123,7 @@ public class Genetic {
 	public static Population reproduce(Population pop){
 //		System.out.println("Enter Reproduce");
 		final int POPULATION_SIZE = pop.plans.size();
-		Population children = new Population(POPULATION_SIZE, false);
+		Population children = new Population(project, POPULATION_SIZE, false);
 		for (int i = 0; i < POPULATION_SIZE; i++){
 			Plan child;
 			do{
@@ -145,8 +148,8 @@ public class Genetic {
 	public static Population selection(Population parent, Population children){
 //		System.out.println("Enter selection");
 		final int POPULATION_SIZE = parent.plans.size();
-		Population newPopulation = new Population(POPULATION_SIZE, false);
-		Population union = new Population(2 * POPULATION_SIZE, false);
+		Population newPopulation = new Population(project, POPULATION_SIZE, false);
+		Population union = new Population(project, 2 * POPULATION_SIZE, false);
 		union.plans.addAll(parent.plans);
 		union.plans.addAll(children.plans);
 		
@@ -203,7 +206,7 @@ public class Genetic {
 			}
 			else {
 				String featureId = plan.featureVector.get(i);
-				for (Feature feature : Project.getMmfs().get(featureId).getPrecursors()){
+				for (Feature feature : project.getMmfs().get(featureId).getPrecursors()){
 					String precursor = feature.getId();
 					if (precursor == ""){
 						continue;
