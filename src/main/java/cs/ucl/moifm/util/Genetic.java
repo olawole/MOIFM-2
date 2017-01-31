@@ -208,7 +208,7 @@ public class Genetic {
 				String featureId = plan.featureVector.get(i);
 				for (Feature feature : project.getMmfs().get(featureId).getPrecursors()){
 					String precursor = feature.getId();
-					if (precursor == ""){
+					if (precursor.equals("")){
 						continue;
 					}
 					int precursorIndex = plan.featureVector.indexOf(precursor);

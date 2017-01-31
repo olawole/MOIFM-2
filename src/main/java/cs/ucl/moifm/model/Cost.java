@@ -7,7 +7,7 @@ public class Cost {
 	
 	private double indus_over_estimation;
 	
-	private TDistribution distribution;
+	private Distribution distribution;
 	
 	private double[] cost_sim;
 	
@@ -18,6 +18,10 @@ public class Cost {
 		this.setIndus_over_estimation(over);
 		this.setIndus_under_estimation(under);
 		setDistribution(new TDistribution(cost_amount,cost_amount * indus_under_estimation, cost_amount * indus_over_estimation));
+	}
+	
+	public Cost(double lower, double upper) throws Exception{
+		setDistribution(new NormalCIDistribution(lower, upper));
 	}
 	
 	public Cost(){}
@@ -46,11 +50,11 @@ public class Cost {
 		this.indus_over_estimation = indus_over_estimation;
 	}
 
-	public TDistribution getDistribution() {
+	public Distribution getDistribution() {
 		return distribution;
 	}
 
-	public void setDistribution(TDistribution distribution) {
+	public void setDistribution(Distribution distribution) {
 		this.distribution = distribution;
 	}
 

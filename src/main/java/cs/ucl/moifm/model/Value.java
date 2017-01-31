@@ -1,57 +1,63 @@
 package cs.ucl.moifm.model;
 
-import org.apache.commons.math3.distribution.NormalDistribution;
-
 public class Value {
-	private static final double AVERAGE_UNDER_ESTIMATION = 1.2;
+//	private static final double AVERAGE_UNDER_ESTIMATION = 1.2;
 	
-	private double initial_value;
+//	private double initial_value;
+//	
+//	private double growth_rate;
+//	
+//	private NormalDistribution valDistribution;
 	
-	private double growth_rate;
-	
-	private NormalDistribution valDistribution;
-	
-	private TDistribution[] value;
+	private Distribution value;
 	
 	private double[][] value_sim;
 	
 	private double[] avg_value;
 	
 	
-	public Value (double value, double growthRate, int period){
-		this.valDistribution = new NormalDistribution();
-		initial_value = value;
-		growth_rate = growthRate;
-		valueDistribution(period);
+//	public Value (double value, double growthRate, int period){
+//		this.valDistribution = new NormalDistribution();
+//		initial_value = value;
+//		growth_rate = growthRate;
+//		valueDistribution(period);
+//	}
+	
+	public Value (double least, double mode, double most){
+		setValueDistribution(new TDistribution(least, mode, most));
+	}
+	
+	public Value(double lower, double upper) throws Exception{
+		setValueDistribution(new NormalCIDistribution(lower, upper));
 	}
 	
 	public Value(){}
 	
-	public double valueGrowth(int period){
-		if (period < 1){
-			return initial_value;
-		}
-		double period_rate = growth_rate * Math.abs(valDistribution.sample());
-		double periodValue;
-		periodValue = initial_value * Math.pow(1 + period_rate / 100, period);
-		return periodValue;
-	}
+//	public double valueGrowth(int period){
+//		if (period < 1){
+//			return initial_value;
+//		}
+//		double period_rate = growth_rate * Math.abs(valDistribution.sample());
+//		double periodValue;
+//		periodValue = initial_value * Math.pow(1 + period_rate / 100, period);
+//		return periodValue;
+//	}
 	
-	public void valueDistribution(int no_period){
-		value = new TDistribution[no_period];
-		double least = 0.0, most, mode;
-		for (int i = 0; i < no_period; i++){
-			mode = valueGrowth(i);
-			most = mode * AVERAGE_UNDER_ESTIMATION;
-			value[i] = new TDistribution(least, mode, most);
-		}
-	}
+//	public void valueDistribution(int no_period){
+//		value = new TDistribution[no_period];
+//		double least = 0.0, most, mode;
+//		for (int i = 0; i < no_period; i++){
+//			mode = valueGrowth(i);
+//			most = mode * AVERAGE_UNDER_ESTIMATION;
+//			value[i] = new TDistribution(least, mode, most);
+//		}
+//	}
 
-	public TDistribution[] getValue() {
+	public Distribution getValue() {
 		return value;
 	}
 
-	public void setValue(TDistribution[] value) {
+	public void setValueDistribution(Distribution value) {
 		this.value = value;
 	}
 

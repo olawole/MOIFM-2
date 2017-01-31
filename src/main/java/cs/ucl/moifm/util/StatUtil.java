@@ -3,7 +3,7 @@ package cs.ucl.moifm.util;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-public class StatUtils {
+public class StatUtil {
 	
 	public static double round(double value, int places){
 		if (places < 0) throw new IllegalArgumentException();

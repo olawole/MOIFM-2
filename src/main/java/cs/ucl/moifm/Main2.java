@@ -16,7 +16,7 @@ public class Main2 {
 		// TODO Auto-generated method stub
 		try {
 			long startTime = System.currentTimeMillis();
-			Project project = new Project("Project 1", 16, 0.01,"cost1.csv", "value1.csv", "precedence3.csv");
+			Project project = new Project("Project 1", 20, 0.01,"cost1.csv", "value1.csv", "precedence3.csv", "Triangular");
 			System.out.println("Parsing = " + (System.currentTimeMillis() - startTime));
 	//		MOIFM.parseModel("cost1.csv", "precedence3.csv", "value1.csv");
 	//		MOIFM.precedenceGraph(project);
@@ -26,19 +26,19 @@ public class Main2 {
 			System.out.println("SANPV = " + (System.currentTimeMillis() - startTime));
 			Population randomPop = MOIFM.generateRandomPlan(project, 100);
 			System.out.println("Random = " + (System.currentTimeMillis() - startTime));
-			Population finalPop = MOIFM.evolvePopulation(project, randomPop, 100);
+			Population finalPop = MOIFM.evolvePopulation(project, randomPop, 50);
 			System.out.println("Evolution = " + (System.currentTimeMillis() - startTime));
 			Front pareto = MOIFM.getParetoSolutions(finalPop);
 			System.out.println(pareto.members.size());
 			MOIFM.drawScatterPlot(pareto, Genetic.allSolution);
 			MOIFM.writeSolutionsToFile(pareto, Genetic.allSolution);
-	//		HashMap<String, Double[][]> Analysis = MOIFM.CashAnalysis(pareto.members);
-	//		MOIFM.analyisCurve(Analysis, Project.getPeriods(),Project.getFeatures().size());
-	//		RoadMap roadmap = new RoadMap(pareto.members);
-	//		roadmap.writeDot1();
-	//		roadmap.writeDot2();
-	//		Double[][] cfa = MOIFM.planCashAnalysis(pareto.members.get(0), project);
-	//		MOIFM.analyisCurve(cfa, project,pareto.members.get(0).transformPlan().toString());
+//			HashMap<String, Double[][]> Analysis = MOIFM.CashAnalysis(pareto.members);
+//			MOIFM.analyisCurve(Analysis, project.getPeriods(),project.getFeatures().size());
+//			RoadMap roadmap = new RoadMap(pareto.members);
+//			roadmap.writeDot1();
+//			roadmap.writeDot2();
+//			Double[][] cfa = MOIFM.planCashAnalysis(pareto.members.get(0));
+//			MOIFM.analyisCurve(project.getMmfs(), project.getPeriods(), cfa,pareto.members.get(0).transformPlan().toString());
 			long runtime = System.currentTimeMillis() - startTime;
 			System.out.println("Runtime = " + (runtime / 1000) + " Seconds");
 		} catch (IOException e) {

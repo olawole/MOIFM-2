@@ -9,7 +9,7 @@ import java.util.Map;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import cs.ucl.moifm.util.StatUtils;
+import cs.ucl.moifm.util.StatUtil;
 
 /**
  * 
@@ -195,12 +195,12 @@ public class Plan {
 			statsCost.addValue(cost[i]);
 		}
 		
-		expectedCost = StatUtils.round(statsCost.getMean(), 2);
-		minCost = StatUtils.round(statsCost.getMin(), 2);
-		maxCost = StatUtils.round(statsCost.getMax(), 2);
-		expectedNPV = StatUtils.round(statsNpv.getMean(), 2);
-		minNPV = StatUtils.round(statsNpv.getMin(), 2);
-		maxNPV = StatUtils.round(statsNpv.getMax(), 2);
+		expectedCost = StatUtil.round(statsCost.getMean(), 2);
+		minCost = StatUtil.round(statsCost.getMin(), 2);
+		maxCost = StatUtil.round(statsCost.getMax(), 2);
+		expectedNPV = StatUtil.round(statsNpv.getMean(), 2);
+		minNPV = StatUtil.round(statsNpv.getMin(), 2);
+		maxNPV = StatUtil.round(statsNpv.getMax(), 2);
 		double npvSD = statsNpv.getStandardDeviation();
 		if (npvSD == 0){
 			investmentRisk = 0;
@@ -273,7 +273,7 @@ public class Plan {
 		for (int i = 0; i < chromosome.size(); i++){
 			String featureId = featureVector.get(i);
 			String precursor = project.getMmfs().get(featureId).getPrecursorString();
-			if (precursor == ""){
+			if (precursor.equals("")){
 				continue;
 			}
 			int precursorIndex = featureVector.indexOf(precursor);
@@ -295,7 +295,7 @@ public class Plan {
 			}
 			String featureId = featureVector.get(i);
 			String precursor = project.getMmfs().get(featureId).getPrecursorString();
-			if (precursor == ""){
+			if (precursor.equals("")){
 				continue;
 			}
 			int precursorIndex = featureVector.indexOf(precursor);			
@@ -322,7 +322,7 @@ public class Plan {
 			String featureId = featureVector.get(i);
 			for (Feature feature : project.getMmfs().get(featureId).getPrecursors()){
 				String precursor = feature.getId();
-				if (precursor == ""){
+				if (precursor.equals("")){
 					continue;
 				}
 				int precursorIndex = featureVector.indexOf(precursor);			
@@ -391,7 +391,8 @@ public class Plan {
 				for (String feature : features){
 					int column = entry.getKey()-1;
 					Double[] cf = new Double[project.getPeriods()]; //Project.getSimAverage().get(feature);
-					cf[0] = project.getMmfs().get(feature).getCostDistribution().getAvg_sim();
+					cf[0] = -(project.getMmfs().get(feature).getCostDistribution().getAvg_sim());
+					//error caused by AE not having value
 					double[] value = project.getMmfs().get(feature).getValueDistribution().getAvg_value(); 
 					for (int k = 1; k < cf.length; k++){
 						cf[k] = value[k-1];

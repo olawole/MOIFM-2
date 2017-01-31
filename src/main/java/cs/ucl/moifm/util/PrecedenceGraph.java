@@ -134,7 +134,7 @@ public class PrecedenceGraph
         	i++;
         }
         for (i = 0; i < vertices.length; i++){
-        	if (mapping.get(vertices[i]) != ""){
+        	if (mapping.get(vertices[i]).equals("")){
         		for (String s : mapping.get(vertices[i]).split(",")){
         			g.addEdge(vertices[i], s);
         		}

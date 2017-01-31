@@ -1,17 +1,12 @@
 package cs.ucl.moifm.model;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
-
 import com.opencsv.CSVReader;
 
 
@@ -30,6 +25,7 @@ public class Project{
     private  int maxMmfsPerPeriod;
     private  List<String> strands;
     public  int nOfSim;
+    public String distributionType;
     
     private  double budgetConstraint;
     
@@ -50,9 +46,11 @@ public class Project{
         this.features = new ArrayList<String>();
     }
      
-    public Project(String projName, int noOfPeriod, double intRate, String featurePath, String valuePath, String precPath) throws FileNotFoundException, IOException, FeatureException{
+    public Project(String projName, int noOfPeriod, double intRate, String featurePath, 
+    		String valuePath, String precPath, String distType) throws Exception{
     	 this.name = projName;
          this.periods = noOfPeriod;
+         this.distributionType = distType;
          this.interestRate = intRate;
          this.myFeatures = new LinkedHashMap<String, Feature>();
          //this.maxMmfsPerPeriod = 1;
@@ -196,9 +194,9 @@ public class Project{
 //        return nextId;
 //    }
 
-    public  Feature get(int index) {
-        return myFeatures.get(index);
-    }
+//    public Feature get(int index) {
+//        return myFeatures.get(index);
+//    }
 
     public  Feature get(String id) {
         
@@ -222,7 +220,8 @@ public class Project{
             }
         }
         mmf.setProject(null);
-        myFeatures.remove(mmf);
+        myFeatures.remove(mmf.getId());
+        //myFeatures.remove(mmf);
     }
 
     /**
@@ -373,18 +372,37 @@ public class Project{
 	    this.setFeatures();	  	  
 	}
 	
-	public void readValues (CSVReader reader) throws IOException, FeatureException{
+	public void readValues (CSVReader reader) throws Exception{
 		String[] line;
-		reader.readNext();
-		while ((line = reader.readNext()) != null){
-			String id = line[0];
-			Double value = Double.parseDouble(line[1]);
-			Double growth = Double.parseDouble(line[2]);
-			Value valueD = new Value(value, growth, this.getPeriods());
-			if (this.getMmfs().get(id) != null){
-				this.getMmfs().get(id).setValueDistribution(valueD);
+		switch (distributionType){
+		case "Triangular":
+			reader.readNext();
+			while ((line = reader.readNext()) != null){
+				String id = line[0];
+				Double least = Double.parseDouble(line[1]);
+				Double mode = Double.parseDouble(line[2]);
+				Double most = Double.parseDouble(line[3]);
+				Value valueD = new Value(least, mode, most);
+				if (this.getMmfs().get(id) != null){
+					this.getMmfs().get(id).setValueDistribution(valueD);
+				}
 			}
+			break;
+		case "NormalCI":
+			reader.readNext();
+			while ((line = reader.readNext()) != null){
+				String id = line[0];
+				Double lower = Double.parseDouble(line[1]);
+				Double upper = Double.parseDouble(line[2]);
+				Value valueD = new Value(lower, upper);
+				if (this.getMmfs().get(id) != null){
+					this.getMmfs().get(id).setValueDistribution(valueD);
+				}
+			}
+			break;
+		default: throw new Exception("No distribution selected");
 		}
+		
 	}
 	
 	public void convertFileToPrecedence(CSVReader predReader) throws IOException, FeatureException{

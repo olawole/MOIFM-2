@@ -91,7 +91,7 @@ public class Feature {
         this.devPeriod = 1;
         this.precursors = new ArrayList<Feature>();
         this.setCostDistribution(new Cost());
-        if (type == "MMF"){
+        if (type.equals("MMF")){
         	this.setValueDistribution(new Value());
         }
         else {

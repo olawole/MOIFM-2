@@ -7,20 +7,18 @@ import java.util.HashMap;
 
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map.Entry;
+
+import org.apache.commons.math3.stat.StatUtils;
 
 import cs.ucl.moifm.model.FeatureException;
 import cs.ucl.moifm.model.TDistribution;
+import cs.ucl.moifm.model.Distribution;
 import cs.ucl.moifm.model.Feature;
-import cs.ucl.moifm.model.Project;
-
-import org.apache.commons.math3.distribution.TriangularDistribution;
 
 
 
 public class MCSimulation {
-	
 	//Number of simulation
 	private static final int N = 10000;
 		
@@ -30,14 +28,12 @@ public class MCSimulation {
 		}
 		for(Entry<String, Feature> mmf : myFeatures.entrySet()){
 			//Simulate cash distribution
-			double sum = 0;
-			TDistribution cost = mmf.getValue().getCostDistribution().getDistribution();
+			double avg = 0;
+			Distribution cost = mmf.getValue().getCostDistribution().getDistribution();
 			double[] costsim = new double[N];
-			for(int i = 0; i < N; i++){
-				costsim[i] = cost.sample();
-				sum += costsim[i];
-			}
-			mmf.getValue().getCostDistribution().setAvg_sim(sum / N);
+			costsim = cost.sample(N);
+			avg = StatUtils.mean(costsim);
+			mmf.getValue().getCostDistribution().setAvg_sim(avg);
 			mmf.getValue().getCostDistribution().setCost_sim(costsim);
 		}
 	//	Project.nOfSim = N;
@@ -50,16 +46,15 @@ public class MCSimulation {
 		for(Entry<String, Feature> mmf : myFeatures.entrySet()){
 			//Simulate cash distribution
 			if(mmf.getValue().getValueDistribution() != null){
-				TDistribution[] value = mmf.getValue().getValueDistribution().getValue();
+				Distribution value = mmf.getValue().getValueDistribution().getValue();
 				double[][] valuesim = new double[N][period];
 				double[] avgsim = new double[period];
-				for(int i = 0; i < value.length; i++){
-					double sum = 0;
-					for(int j = 0; j < N; j++){
-						valuesim[j][i] = value[i].sample();
-						sum += valuesim[j][i];
+				for(int i = 0; i < period; i++){
+					//double sum = 0;
+					for(int j = 0; j < N; j++){ //create samples without loop
+						valuesim[j][i] = value.sample();
 					}
-					avgsim[i] = sum / N;
+					avgsim[i] = StatUtils.mean(valuesim[i]);
 				}
 				mmf.getValue().getValueDistribution().setAvg_value(avgsim);
 				mmf.getValue().getValueDistribution().setValue_sim(valuesim);

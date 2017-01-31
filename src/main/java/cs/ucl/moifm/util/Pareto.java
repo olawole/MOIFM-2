@@ -24,9 +24,9 @@ public class Pareto {
 	
 	private static List<Plan> nonDominated;
 	
-	public Pareto(Population population){
-		Pareto.pop = population;
-	}
+//	public Pareto(Population population){
+//		pop = population;
+//	}
 	
 	public static List<Plan> shortlist(){
 		boolean pareto;
