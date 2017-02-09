@@ -20,8 +20,12 @@ public class Cost {
 		setDistribution(new TDistribution(cost_amount,cost_amount * indus_under_estimation, cost_amount * indus_over_estimation));
 	}
 	
-	public Cost(double lower, double upper) throws Exception{
-		setDistribution(new NormalCIDistribution(lower, upper));
+	public Cost(double lower, double upper, String distType) throws Exception{
+		if (distType.equals("NormalCI"))
+			setDistribution(new NormalCIDistribution(lower, upper));
+		else if (distType.equalsIgnoreCase("Normal"))
+			setDistribution(new NDistribution(lower, upper));
+		else;
 	}
 	
 	public Cost(){}

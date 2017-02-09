@@ -234,7 +234,7 @@ public class RoadMap {
 		}
 		dotString += "}";
 		try {
-			FileWriter output = new FileWriter("roadmap.dot");
+			FileWriter output = new FileWriter("roadmap1.dot");
 			output.write(dotString);
 			output.close();
 		} catch (IOException e) {
@@ -322,7 +322,7 @@ public class RoadMap {
 		}
 		dotString += "}";
 		try {
-			FileWriter output = new FileWriter("roadmap1.dot");
+			FileWriter output = new FileWriter("roadmap2.dot");
 			output.write(dotString);
 			output.close();
 		} catch (IOException e) {

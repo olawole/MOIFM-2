@@ -136,7 +136,7 @@ public class Genetic {
 //				System.out.println(child.toString() + " = " + child.isValidPlan(pop.project));
 			} while (!(child.isValidPlan()) || Population.archive.contains(child.toString()));
 			
-			child.evaluateFitness();
+			//child.evaluateFitness();
 			children.savePlan(i, child);
 			Population.archive.add(child.toString());
 			allSolution.add(child);

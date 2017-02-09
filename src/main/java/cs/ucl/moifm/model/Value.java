@@ -27,8 +27,12 @@ public class Value {
 		setValueDistribution(new TDistribution(least, mode, most));
 	}
 	
-	public Value(double lower, double upper) throws Exception{
-		setValueDistribution(new NormalCIDistribution(lower, upper));
+	public Value(double lower, double upper, String distType) throws Exception{
+		if (distType.equalsIgnoreCase("NormalCI"))
+			setValueDistribution(new NormalCIDistribution(lower, upper));
+		else if (distType.equalsIgnoreCase("Normal"))
+			setValueDistribution(new NDistribution(lower, upper));
+		else;
 	}
 	
 	public Value(){}

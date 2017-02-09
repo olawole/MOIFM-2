@@ -37,7 +37,7 @@ public class Plot3D extends JFrame {
         ScatterXYZRenderer renderer = (ScatterXYZRenderer) plot.getRenderer();
         plot.setDimensions(new Dimension3D(10, 6, 10));
         renderer.setSize(0.08);
-        renderer.setColors(new Color(255, 128, 128), new Color(0, 255, 0));
+        renderer.setColors(new Color(0, 0, 0), new Color(0, 255, 0));
 //        LogAxis3D yAxis = new LogAxis3D("Y (log scale)");
 //        yAxis.setTickLabelOrientation(LabelOrientation.PERPENDICULAR);
 //        yAxis.receive(new ChartStyler(chart.getStyle()));

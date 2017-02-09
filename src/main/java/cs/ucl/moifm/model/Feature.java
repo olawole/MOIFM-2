@@ -394,6 +394,9 @@ public class Feature {
     public String getType(){
     	return this.type;
     }
+    public void setType(String s){
+    	this.type = s;
+    }
     
     
 }

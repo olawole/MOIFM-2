@@ -11,6 +11,12 @@ public class DistributionFactory {
 		if (distributionType.equalsIgnoreCase("NormalCI")){
 			return new NormalCIDistribution();
 		}
+		if (distributionType.equalsIgnoreCase("Normal")){
+			return new NDistribution();
+		}
+		if (distributionType.equalsIgnoreCase("LogNormal")){
+			return new LogNDistribution();
+		}
 		return null;
 	}
 }

@@ -135,12 +135,13 @@ public class Plan {
 		Double[] npv = new Double[project.nOfSim];
 		Double[] cost = new Double[project.nOfSim];
 		HashMap<Integer, String> plan = this.transformPlan();
-						
+		//System.out.println(plan.toString());				
 		for (int k = 0; k < project.nOfSim; k++){
 			npv[k] = cost[k] = 0.0;
 			List<String> executedFeatures = new ArrayList<String>();
 			for (Map.Entry<Integer, String> entry : plan.entrySet()){
 				int currentPeriod = entry.getKey();
+				//System.out.println(currentPeriod);
 				double periodRevenue = 0;
 				double periodCost = 0;
 				double periodInvestment = 0 ;
@@ -168,7 +169,7 @@ public class Plan {
 				periodInvestment -= periodRevenue;
 				periodCost = (periodInvestment > 0) ? periodInvestment: 0;
 				if (Math.abs(periodCost) > 3000){
-					System.out.println("Over");
+					//System.out.println("Over");
 //					expectedCost = Double.NEGATIVE_INFINITY;
 //					expectedNPV = Double.NEGATIVE_INFINITY;
 //					investmentRisk = Double.POSITIVE_INFINITY;
@@ -271,6 +272,9 @@ public class Plan {
 		
 		//for each feature in featurevector
 		for (int i = 0; i < chromosome.size(); i++){
+			if (chromosome.get(i) > project.getPeriods()){
+				return false;
+			}
 			String featureId = featureVector.get(i);
 			String precursor = project.getMmfs().get(featureId).getPrecursorString();
 			if (precursor.equals("")){
@@ -312,12 +316,15 @@ public class Plan {
 	}
 	
 	public boolean isValidPlan(){
-		boolean isValid = true;
+		//boolean isValid = true;
 		
 		//for each feature in featurevector
 		for (int i = 0; i < chromosome.size(); i++){
 			if (chromosome.get(i) == 0){
 				continue;
+			}
+			if (chromosome.get(i) > project.getPeriods()){
+				return false;
 			}
 			String featureId = featureVector.get(i);
 			for (Feature feature : project.getMmfs().get(featureId).getPrecursors()){
@@ -336,7 +343,7 @@ public class Plan {
 			}
 		}
 		// if 
-		return isValid;
+		return evaluateFitness();
 	}
 	
 	/**

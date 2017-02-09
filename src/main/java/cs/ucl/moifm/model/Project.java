@@ -80,7 +80,7 @@ public class Project{
     }
     
     /**
-     * Sets the number of periods and fires the event EVENT_PERIODS. Must be
+     * Sets the number of periods. Must be
      * greater than 0. Will not make any changes to the revenue data of MMFs.
      * That means MMF will remember revenue data that is entered for periods
      * beyond this setting.
@@ -352,23 +352,62 @@ public class Project{
 		this.simAverage = simAverage;
 	}
 	
-	public  void readFeatures (CSVReader reader) throws IOException, FeatureException{
+	public  void readFeatures (CSVReader reader) throws Exception{
 		String [] nextLine;
 		reader.readNext();
-	    while ((nextLine = reader.readNext()) != null) {
-	    	String type = null, id = null;
-	    	Double cost;
-	    	String[] name = nextLine[0].split(" ");
-	    	type = name[0];
-	    	id = name[1];
-	    	Feature mmf = new Feature(id, type);
-	    	cost = Double.parseDouble(nextLine[1]);
-	//    	growth = Double.parseDouble(nextLine[2]);
-	    	Cost costD = new Cost(cost, 1.5, 1.2);
-	    	mmf.setCostDistribution(costD);
-	    	this.add(mmf);
-	 //   	this.setPeriods(cashvalue.size());
-	     }
+		switch (distributionType){
+		case "Triangular":
+			while ((nextLine = reader.readNext()) != null) {
+		    	String type = null, id = null;
+		    	Double cost;
+//		    	String[] name = nextLine[0].split(" ");
+//		    	type = name[0];
+//		    	id = name[1];
+		    	id = nextLine[0];
+		    	type = "AE";
+		    	Feature mmf = new Feature(id, type);
+		    	cost = Double.parseDouble(nextLine[1]);
+		//    	growth = Double.parseDouble(nextLine[2]);
+		    	Cost costD = new Cost(cost, 1.5, 1.2);
+		    	mmf.setCostDistribution(costD);
+		    	this.add(mmf);
+		 //   	this.setPeriods(cashvalue.size());
+		     }
+			break;
+			
+		case "Normal":
+			while ((nextLine = reader.readNext()) != null) {
+		    	String type = null, id = null;
+		    	Double mean, sd;
+//		    	String[] name = nextLine[0].split(" ");
+//		    	type = name[0];
+		    	id = nextLine[0];
+		    	type = "AE";
+		    	Feature mmf = new Feature(id, type);
+		    	mean = Double.parseDouble(nextLine[1]);
+		    	sd = Double.parseDouble(nextLine[2]);
+		//    	growth = Double.parseDouble(nextLine[2]);
+		    	Cost costD = new Cost(mean, sd, "Normal");
+		    	mmf.setCostDistribution(costD);
+		    	this.add(mmf);
+		 //   	this.setPeriods(cashvalue.size());
+		     } break;
+		 default:
+		}
+//	    while ((nextLine = reader.readNext()) != null) {
+//	    	String type = null, id = null;
+//	    	Double cost;
+//	    	String[] name = nextLine[0].split(" ");
+//	    	type = name[0];
+//	    	id = name[1];
+//	    	Feature mmf = new Feature(id, type);
+//	    	cost = Double.parseDouble(nextLine[1]);
+//	//    	growth = Double.parseDouble(nextLine[2]);
+//	    	Cost costD = new Cost(cost, 1.5, 1.2);
+//	    	mmf.setCostDistribution(costD);
+//	    	this.add(mmf);
+//	 //   	this.setPeriods(cashvalue.size());
+//	     }
 	    this.setFeatures();	  	  
 	}
 	
@@ -394,9 +433,22 @@ public class Project{
 				String id = line[0];
 				Double lower = Double.parseDouble(line[1]);
 				Double upper = Double.parseDouble(line[2]);
-				Value valueD = new Value(lower, upper);
+				Value valueD = new Value(lower, upper, "NormalCI");
 				if (this.getMmfs().get(id) != null){
 					this.getMmfs().get(id).setValueDistribution(valueD);
+				}
+			}
+			break;
+		case "Normal":
+			reader.readNext();
+			while ((line = reader.readNext()) != null){
+				String id = line[0];
+				Double mean = Double.parseDouble(line[1]);
+				Double sd = Double.parseDouble(line[2]);
+				Value valueD = new Value(mean, sd,"Normal");
+				if (this.getMmfs().get(id) != null){
+					this.getMmfs().get(id).setValueDistribution(valueD);
+					this.getMmfs().get(id).setType("MMF");
 				}
 			}
 			break;
