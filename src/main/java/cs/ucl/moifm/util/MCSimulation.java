@@ -50,11 +50,12 @@ public class MCSimulation {
 				double[][] valuesim = new double[N][period];
 				double[] avgsim = new double[period];
 				for(int i = 0; i < period; i++){
-					//double sum = 0;
+					double sum = 0;
 					for(int j = 0; j < N; j++){ //create samples without loop
-						valuesim[j][i] = value.sample();
+						valuesim[j][i] = Math.abs(value.sample());
+						sum += valuesim[j][i];
 					}
-					avgsim[i] = StatUtils.mean(valuesim[i]);
+					avgsim[i] = sum / N;
 				}
 				mmf.getValue().getValueDistribution().setAvg_value(avgsim);
 				mmf.getValue().getValueDistribution().setValue_sim(valuesim);

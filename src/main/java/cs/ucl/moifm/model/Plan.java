@@ -168,7 +168,7 @@ public class Plan {
 				}
 				periodInvestment -= periodRevenue;
 				periodCost = (periodInvestment > 0) ? periodInvestment: 0;
-				if (Math.abs(periodCost) > 3000){
+				if (Math.abs(periodCost) > 600){
 					//System.out.println("Over");
 //					expectedCost = Double.NEGATIVE_INFINITY;
 //					expectedNPV = Double.NEGATIVE_INFINITY;
@@ -400,9 +400,16 @@ public class Plan {
 					Double[] cf = new Double[project.getPeriods()]; //Project.getSimAverage().get(feature);
 					cf[0] = -(project.getMmfs().get(feature).getCostDistribution().getAvg_sim());
 					//error caused by AE not having value
-					double[] value = project.getMmfs().get(feature).getValueDistribution().getAvg_value(); 
-					for (int k = 1; k < cf.length; k++){
-						cf[k] = value[k-1];
+					if (project.getMmfs().get(feature).getType().equalsIgnoreCase("AE")){
+						for (int k = 1; k < cf.length; k++){
+							cf[k] = 0.0;
+						}
+					}
+					else {
+						double[] value = project.getMmfs().get(feature).getValueDistribution().getAvg_value(); 
+						for (int k = 1; k < cf.length; k++){
+							cf[k] = value[k-1];
+						}
 					}
 					int index = 0;
 					while (column < cFlow[row].length){
