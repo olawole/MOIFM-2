@@ -157,15 +157,19 @@ public class RoadMap {
 	    return null;
 	}
 //	
-	public void writeDot1(){
+	public void writeDot1(String filename){
 		HashMap<Integer, String> rank = new HashMap<Integer, String>();
 		String all = "";
 		String lastNode = "";
 		String dotString = "digraph G { \n";
 		dotString += "\trankdir=LR\n";
 		dotString += "\troot[shape=point]\n";
+		int num = 0;
 	//	List<String> nodes = new ArrayList<String>();
 		for (Plan p : optimal){
+			if (++num > 20){
+				break;
+			}
 			HashMap<Integer, String> solution = p.transformPlan();
 			String label = "";
 			if (solution.containsKey(0)){
@@ -234,7 +238,7 @@ public class RoadMap {
 		}
 		dotString += "}";
 		try {
-			FileWriter output = new FileWriter("roadmap1.dot");
+			FileWriter output = new FileWriter(filename+".dot");
 			output.write(dotString);
 			output.close();
 		} catch (IOException e) {
@@ -243,15 +247,19 @@ public class RoadMap {
 		}
 	}
 	
-	public void writeDot2(){
+	public void writeDot2(String filename){
 		HashMap<Integer, String> rank = new HashMap<Integer, String>();
 		String all = "";
 		String lastNode = "";
 		String dotString = "digraph G { \n";
 		dotString += "\trankdir=LR\n";
 		dotString += "\troot[shape=point]\n";
+		int num = 0;
 	//	List<String> nodes = new ArrayList<String>();
 		for (Plan p : optimal){
+			if (++num > 20){
+				break;
+			}
 			HashMap<Integer, String> solution = p.transformPlan();
 			String label = "";
 			if (solution.containsKey(0)){
@@ -322,7 +330,7 @@ public class RoadMap {
 		}
 		dotString += "}";
 		try {
-			FileWriter output = new FileWriter("roadmap2.dot");
+			FileWriter output = new FileWriter(filename+".dot");
 			output.write(dotString);
 			output.close();
 		} catch (IOException e) {

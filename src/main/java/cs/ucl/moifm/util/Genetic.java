@@ -104,9 +104,55 @@ public class Genetic {
 		return child;
 	}
 	
+//	public static Plan[] crossover1(Plan parent_1,
+//			Plan parent_2) {
+//		Plan[] offspring = new Plan[2];
+//		Plan child = new Plan(project, project.getFeatures().size());
+//		Plan child1 = new Plan(project, project.getFeatures().size());
+//		int startPos, endPos;
+//		do {
+//			startPos = (int) (Math.random() * parent_1.getChromosome().size());
+//			endPos = (int) (Math.random() * parent_1.getChromosome().size());
+//		} while (Math.abs(startPos - endPos) < 2);
+//		
+//		//note
+//		for (int i = 0; i < child.getChromosome().size(); i++){
+//			if (startPos < endPos && i > startPos && i < endPos){
+//				child.getChromosome().remove(i);
+//				child1.getChromosome().remove(i);
+//				child.getChromosome().add(i, parent_1.getChromosome().get(i));
+//				child1.getChromosome().add(i, parent_2.getChromosome().get(i));
+//			}
+//			else if (startPos > endPos){
+//				if (!(i < startPos && i > endPos)){
+//					child.getChromosome().remove(i);
+//					child1.getChromosome().remove(i);
+//					child.getChromosome().add(i, parent_1.getChromosome().get(i));
+//					child1.getChromosome().add(i, parent_2.getChromosome().get(i));
+//				}
+//			}
+//		}
+//		
+//		// Loop through parent 2 plan
+//		for (int i = 0; i < parent_2.getChromosome().size(); i++){
+//			// if child doesn't have the MMF add it
+//			if (child.getChromosome().get(i) == 0){
+//				child.getChromosome().remove(i);
+//				child.getChromosome().add(i, parent_2.getChromosome().get(i));
+//			}
+//			if (child1.getChromosome().get(i) == 0){
+//				child1.getChromosome().remove(i);
+//				child1.getChromosome().add(i, parent_1.getChromosome().get(i));
+//			}
+//		}
+//		++crossOverNumber;
+//		offspring[0] = child;
+//		offspring[1] = child1;
+//		return offspring;
+//	}
+	
 	// Select candidate sequence for crossover operation
 	public static Plan tournamentSelection(Population pop) {
-		// Create a tournament population
 		int i = 0, j = 0;
 		do {
 			i = (int) (Math.random() * pop.plans.size());
@@ -121,7 +167,7 @@ public class Genetic {
 	}
 	
 	public static Population reproduce(Population pop){
-//		System.out.println("Enter Reproduce");
+		long time = System.currentTimeMillis();
 		final int POPULATION_SIZE = pop.plans.size();
 		Population children = new Population(project, POPULATION_SIZE, false);
 		for (int i = 0; i < POPULATION_SIZE; i++){
@@ -133,20 +179,51 @@ public class Genetic {
 				mutate(child);
 				if(child.getChromosome().contains(0))
 					repairChromosome(child);
-//				System.out.println(child.toString() + " = " + child.isValidPlan(pop.project));
 			} while (!(child.isValidPlan()) || Population.archive.contains(child.toString()));
 			
-			//child.evaluateFitness();
 			children.savePlan(i, child);
 			Population.archive.add(child.toString());
 			allSolution.add(child);
 		}
-//		System.out.println("Exit Reproduce");
+		System.out.println((System.currentTimeMillis()-time) / 1000);
 		return children;
 	}
 	
+//	public static Population reproduce1(Population pop){
+////		System.out.println("Enter Reproduce");
+//		final int POPULATION_SIZE = pop.plans.size();
+//		Population children = new Population(project, POPULATION_SIZE, false);
+//		for (int i = 0; i < POPULATION_SIZE; i++){
+//			Plan child = new Plan(project, project.getFeatures().size());
+//			do{
+//				Plan[] offspring;
+//				Plan parent_1 = tournamentSelection(pop);
+//				Plan parent_2 = tournamentSelection(pop);
+//				offspring = crossover1(parent_1, parent_2);
+//				for (int j=0; j < 2; j++){
+//					mutate(offspring[j]);
+//					if(offspring[j].getChromosome().contains(0))
+//						repairChromosome(offspring[j]);
+//					if (offspring[j].isValidPlan()){
+//						child = offspring[j];
+//						break;
+//					}
+//					child = offspring[j];
+//				}
+//				
+////				System.out.println(child.toString() + " = " + child.isValidPlan(pop.project));
+//			} while (!(child.isValidPlan()) || Population.archive.contains(child.toString()));
+//			
+//			//child.evaluateFitness();
+//			children.savePlan(i, child);
+//			Population.archive.add(child.toString());
+//			allSolution.add(child);
+//		}
+////		System.out.println("Exit Reproduce");
+//		return children;
+//	}
+	
 	public static Population selection(Population parent, Population children){
-//		System.out.println("Enter selection");
 		final int POPULATION_SIZE = parent.plans.size();
 		Population newPopulation = new Population(project, POPULATION_SIZE, false);
 		Population union = new Population(project, 2 * POPULATION_SIZE, false);
@@ -161,33 +238,27 @@ public class Genetic {
 			Front front = fronts.get(i);
 			
 			if (inserted + front.members.size() > POPULATION_SIZE){
-//				System.out.println("Enter if");
 				front.crowdingDistance();
-//				System.out.println("Exit if");
 				break;
 			}
 			int j = 0;
-//			System.out.println("Enter while");
 			while (j < front.members.size()){
 				newPopulation.savePlan(inserted, front.members.get(j));
 				++inserted;
 				++j;
 			}
-//			System.out.println("Exit while");
 			
 		}
 		int remaining = POPULATION_SIZE - inserted;
 		if (remaining > 0){
 			Front f = fronts.get(last_front);
 			int j = 0;
-//			f.sortByCrowding(0, fronts.get(last_front).members.size()-1);
 			f.sortByCrowding();
 			for (int i = inserted; i < POPULATION_SIZE; i++){
 				newPopulation.savePlan(inserted, f.members.get(j));
 				j++;
 			}
 		}
-//		System.out.println("Exit selection");
 		return newPopulation;
 	}
 	

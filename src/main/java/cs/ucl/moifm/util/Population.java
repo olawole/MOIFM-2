@@ -49,10 +49,10 @@ public class Population {
 	}
 	
 	/*
-	 * Save valid delivery sequences
+	 * Save valid release plan
 	 * 
 	 * @param index
-	 * @param newSequence
+	 * @param newPlan
 	 * 
 	 */
 	public void savePlan(int index, Plan newPlan) {

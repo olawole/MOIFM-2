@@ -128,8 +128,8 @@ public class MOIFM {
 	 * @param pareto a set of non-dominated solutions
 	 * @param dominated a set of dominated solutions
 	 */
-	public static void drawScatterPlot(Front pareto, List<Plan> dominated){
-		Plot3D scatter = new Plot3D(pareto, dominated);
+	public static void drawScatterPlot(Front pareto, List<Plan> dominated, String title){
+		Plot3D scatter = new Plot3D(pareto, dominated, title);
     	XYZDataset data = scatter.createDataset();
     	Chart3D chart = scatter.createChart(data);
     	Chart3DPanel panel = new Chart3DPanel(chart);
@@ -195,8 +195,8 @@ public class MOIFM {
 	 * @param dominated a set of dominated solutions
 	 * @throws IOException
 	 */
-	public static void writeSolutionsToFile(Front pareto, List<Plan> dominated) throws IOException{
-		FileWriter output = new FileWriter("solutions.tsv");
+	public static void writeSolutionsToFile(Front pareto, List<Plan> dominated, String filename) throws IOException{
+		FileWriter output = new FileWriter(filename+".tsv");
 		output.append(HEADER.toString());
 		output.append(LINE_SEPERATOR);
 		for (int i = 0; i < dominated.size(); i++){

@@ -24,14 +24,16 @@ import cs.ucl.moifm.model.Plan;
 public class Plot3D extends JFrame {
 	private Front paretoFront;
 	private List<Plan> dominated;
+	private String title;
 	
-	public Plot3D(Front data, List<Plan> dom){
+	public Plot3D(Front data, List<Plan> dom, String title){
 		this.paretoFront = data;
 		this.dominated = dom;
+		this.title = title;
 	}
 	
     public Chart3D createChart(XYZDataset dataset) {
-        Chart3D chart = Chart3DFactory.createScatterChart("Scatter Plot showing Solutions", 
+        Chart3D chart = Chart3DFactory.createScatterChart("Scatter Plot showing Solutions for "+ title, 
                 null, dataset, "Expected Cost", "Expected Value", "Investment Risk");
         XYZPlot plot = (XYZPlot) chart.getPlot();
         ScatterXYZRenderer renderer = (ScatterXYZRenderer) plot.getRenderer();

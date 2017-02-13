@@ -168,11 +168,7 @@ public class Plan {
 				}
 				periodInvestment -= periodRevenue;
 				periodCost = (periodInvestment > 0) ? periodInvestment: 0;
-				if (Math.abs(periodCost) > 600){
-					//System.out.println("Over");
-//					expectedCost = Double.NEGATIVE_INFINITY;
-//					expectedNPV = Double.NEGATIVE_INFINITY;
-//					investmentRisk = Double.POSITIVE_INFINITY;
+				if (Math.abs(periodCost) > 1000){
 					return false;
 				}
 				//value of the feature
